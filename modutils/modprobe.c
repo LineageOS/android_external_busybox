@@ -362,6 +362,7 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 	int rc;
 	unsigned opt;
 	struct module_entry *me;
+	struct stat info;
 
 	opt_complementary = "q-v:v-q";
 	opt = getopt32(argv, INSMOD_OPTS MODPROBE_OPTS INSMOD_ARGS, NULL, NULL);
@@ -386,7 +387,9 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 	/* Goto modules location */
 	xchdir(CONFIG_DEFAULT_MODULES_DIR);
 	uname(&uts);
-	xchdir(uts.release);
+	if (stat(uts.release, &info) == 0) {
+		xchdir(uts.release);
+	}
 
 	/* Retrieve module names of already loaded modules */
 	{
