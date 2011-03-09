@@ -14,7 +14,6 @@
  */
 #include "libbb.h"
 #include "modutils.h"
-#include <sys/utsname.h>
 #include <fnmatch.h>
 
 //#define DBG(fmt, ...) bb_error_msg("%s: " fmt, __func__, ## __VA_ARGS__)
@@ -358,7 +357,6 @@ static void load_modules_dep(void)
 int modprobe_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int modprobe_main(int argc UNUSED_PARAM, char **argv)
 {
-	struct utsname uts;
 	int rc;
 	unsigned opt;
 	struct module_entry *me;
@@ -385,8 +383,6 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 
 	/* Goto modules location */
 	xchdir(CONFIG_DEFAULT_MODULES_DIR);
-	uname(&uts);
-	xchdir(uts.release);
 
 	/* Retrieve module names of already loaded modules */
 	{

@@ -10,7 +10,6 @@
 
 #include "libbb.h"
 /* After libbb.h, since it needs sys/types.h on some systems */
-#include <sys/utsname.h> /* uname() */
 #include <fnmatch.h>
 
 extern int init_module(void *module, unsigned long len, const char *options);
@@ -688,7 +687,6 @@ The following options are useful for people managing distributions:
 int modprobe_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int modprobe_main(int argc UNUSED_PARAM, char **argv)
 {
-	struct utsname uts;
 	char applet0 = applet_name[0];
 	IF_FEATURE_MODPROBE_SMALL_OPTIONS_ON_CMDLINE(char *options;)
 
@@ -707,7 +705,6 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 		/* Goto modules directory */
 		xchdir(CONFIG_DEFAULT_MODULES_DIR);
 	}
-	uname(&uts); /* never fails */
 
 	/* depmod? */
 	if ('d' == applet0) {
@@ -733,8 +730,9 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 		getopt32(argv, "na" "AeF:qru" /* "b:vV", NULL */, NULL);
 		argv += optind;
 		/* if (argv[0] && argv[1]) bb_show_usage(); */
-		/* Goto $VERSION directory */
-		xchdir(argv[0] ? argv[0] : uts.release);
+		if (argv[0]) {
+			xchdir(argv[0]);
+		}
 		/* Force full module scan by asking to find a bogus module.
 		 * This will generate modules.dep.bb as a side effect. */
 		process_module((char*)"/", NULL);
@@ -751,11 +749,6 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 	/* are we rmmod? -> simulate modprobe -r */
 	if ('r' == applet0) {
 		option_mask32 |= OPT_r;
-	}
-
-	if ('i' != applet0) { /* not insmod */
-		/* Goto $VERSION directory */
-		xchdir(uts.release);
 	}
 
 #if ENABLE_FEATURE_MODPROBE_SMALL_OPTIONS_ON_CMDLINE
