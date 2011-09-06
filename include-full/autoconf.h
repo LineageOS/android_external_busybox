@@ -1,8 +1,8 @@
 /*
  * Automatically generated C config: don't edit
- * Busybox version: 1.19.1-cm71
+ * Busybox version: 1.19.2-cm71
  */
-#define AUTOCONF_TIMESTAMP "2011-09-01 04:24 +0200"
+#define AUTOCONF_TIMESTAMP "2011-09-06 12:34 +0200"
 
 #define CONFIG_HAVE_DOT_CONFIG 1
 #define ENABLE_HAVE_DOT_CONFIG 1
@@ -984,10 +984,10 @@
 #define ENABLE_TRUE 1
 #define IF_TRUE(...) __VA_ARGS__
 #define IF_NOT_TRUE(...)
-#define CONFIG_TTY 1
-#define ENABLE_TTY 1
-#define IF_TTY(...) __VA_ARGS__
-#define IF_NOT_TTY(...)
+#undef CONFIG_TTY
+#define ENABLE_TTY 0
+#define IF_TTY(...)
+#define IF_NOT_TTY(...) __VA_ARGS__
 #define CONFIG_UNAME 1
 #define ENABLE_UNAME 1
 #define IF_UNAME(...) __VA_ARGS__
