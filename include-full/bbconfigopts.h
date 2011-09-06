@@ -245,7 +245,7 @@ static const char bbconfig_config[] ALIGN1 =
 "CONFIG_TEE=y\n"
 "CONFIG_FEATURE_TEE_USE_BLOCK_IO=y\n"
 "CONFIG_TRUE=y\n"
-"CONFIG_TTY=y\n"
+"# CONFIG_TTY is not set\n"
 "CONFIG_UNAME=y\n"
 "CONFIG_UNEXPAND=y\n"
 "CONFIG_FEATURE_UNEXPAND_LONG_OPTIONS=y\n"
