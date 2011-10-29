@@ -146,6 +146,10 @@ static const char modprobe_longopts[] ALIGN1 =
 #define MODULE_FLAG_FOUND_IN_MODDEP     0x0004
 #define MODULE_FLAG_BLACKLISTED         0x0008
 
+#if defined(ANDROID) || defined(__ANDROID__)
+#define DONT_USE_UTS_REL_FOLDER
+#endif
+
 struct module_entry { /* I'll call it ME. */
 	unsigned flags;
 	char *modname; /* stripped of /path/, .ext and s/-/_/g */
@@ -445,10 +449,17 @@ static int do_modprobe(struct module_entry *m)
 			options = gather_options_str(options, G.cmdline_mopts);
 
 		if (option_mask32 & OPT_SHOW_DEPS) {
+#ifndef DONT_USE_UTS_REL_FOLDER
 			printf(options ? "insmod %s/%s/%s %s\n"
 					: "insmod %s/%s/%s\n",
 				CONFIG_DEFAULT_MODULES_DIR, G.uts.release, fn,
 				options);
+#else
+			printf(options ? "insmod %s/%s %s\n"
+					: "insmod %s/%s\n",
+				CONFIG_DEFAULT_MODULES_DIR, fn,
+				options);
+#endif
 			free(options);
 			continue;
 		}
@@ -541,8 +552,12 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 
 	/* Goto modules location */
 	xchdir(CONFIG_DEFAULT_MODULES_DIR);
+#ifndef DONT_USE_UTS_REL_FOLDER
 	uname(&G.uts);
-	xchdir(G.uts.release);
+	if (stat(G.uts.release, &info) == 0) {
+		xchdir(G.uts.release);
+	}
+#endif
 
 	if (opt & OPT_LIST_ONLY) {
 		int i;
@@ -590,10 +605,12 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 
 	/* Goto modules location */
 	xchdir(CONFIG_DEFAULT_MODULES_DIR);
-	uname(&uts);
-	if (stat(uts.release, &info) == 0) {
-		xchdir(uts.release);
+#ifndef DONT_USE_UTS_REL_FOLDER
+	uname(&G.uts);
+	if (stat(G.uts.release, &info) == 0) {
+		xchdir(G.uts.release);
 	}
+#endif
 
 	/* Retrieve module names of already loaded modules */
 	{
