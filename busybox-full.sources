@@ -26,7 +26,7 @@ miscutils/bbconfig.c ./miscutils/crond.c ./miscutils/crontab.c miscutils/dc.c mi
 miscutils/flash_lock_unlock.c miscutils/flashcp.c miscutils/mountpoint.c miscutils/nandwrite.c
 miscutils/rx.c miscutils/setserial.c miscutils/setsid.c miscutils/strings.c miscutils/time.c miscutils/timeout.c miscutils/ttysize.c
 
-modutils/modinfo.c modutils/modprobe-small.c modutils/modutils.c
+modutils/modinfo.c modutils/modprobe.c modutils/modutils.c
 modutils/lsmod.c modutils/depmod.c modutils/rmmod.c modutils/insmod.c
 
 networking/arp.c networking/brctl.c networking/dnsd.c networking/ifconfig.c networking/interface.c networking/ip.c networking/nc.c networking/netstat.c networking/nslookup.c networking/ntpd.c networking/ping.c networking/route.c networking/telnet.c networking/telnetd.c networking/tftp.c networking/traceroute.c networking/wget.c

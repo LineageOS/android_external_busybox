@@ -541,8 +541,10 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 
 	/* Goto modules location */
 	xchdir(CONFIG_DEFAULT_MODULES_DIR);
-	uname(&G.uts);
-	xchdir(G.uts.release);
+        uname(&G.uts);
+        if (stat(G.uts.release, &info) == 0) {
+                xchdir(G.uts.release);
+        }
 
 	if (opt & OPT_LIST_ONLY) {
 		int i;
@@ -590,9 +592,9 @@ int modprobe_main(int argc UNUSED_PARAM, char **argv)
 
 	/* Goto modules location */
 	xchdir(CONFIG_DEFAULT_MODULES_DIR);
-	uname(&uts);
-	if (stat(uts.release, &info) == 0) {
-		xchdir(uts.release);
+	uname(&G.uts);
+	if (stat(G.uts.release, &info) == 0) {
+		xchdir(G.uts.release);
 	}
 
 	/* Retrieve module names of already loaded modules */
