@@ -1,8 +1,14 @@
 LOCAL_PATH := $(call my-dir)
 
 
+# Bionic Branches Switches (CM7/AOSP/ICS)
+HAVE_CLEARSILVER := true
+BIONIC_ICS := false
+
+
 # Make a static library for clearsilver's regex.
 # This prevents multiple symbol definition error....
+ifeq ($(HAVE_CLEARSILVER),true)
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES := ../clearsilver/util/regex/regex.c
 LOCAL_MODULE := libclearsilverregex
@@ -10,7 +16,7 @@ LOCAL_C_INCLUDES := \
         external/clearsilver \
         external/clearsilver/util/regex
 include $(BUILD_STATIC_LIBRARY)
-
+endif
 
 
 # Execute make clean, make prepare and copy profiles required for normal & static busybox (recovery)
@@ -67,12 +73,16 @@ endif
 BUSYBOX_C_INCLUDES = \
 	$(LOCAL_PATH)/include-$(BUSYBOX_CONFIG) \
 	$(LOCAL_PATH)/include $(LOCAL_PATH)/libbb \
-	external/clearsilver \
-	external/clearsilver/util/regex \
 	bionic/libc/private \
 	bionic/libm/include \
 	bionic/libm \
 	libc/kernel/common
+
+ifeq ($(HAVE_CLEARSILVER),true)
+BUSYBOX_C_INCLUDES += \
+	external/clearsilver \
+	external/clearsilver/util/regex
+endif
 
 BUSYBOX_CFLAGS = \
 	-Werror=implicit \
@@ -82,6 +92,11 @@ BUSYBOX_CFLAGS = \
 	-D'CONFIG_DEFAULT_MODULES_DIR="$(KERNEL_MODULES_DIR)"' \
 	-D'BB_VER="$(strip $(shell $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
 
+
+# to handle differences in ICS (ipv6)
+ifeq ($(BIONIC_ICS),true)
+BUSYBOX_CFLAGS += -DBIONIC_ICS
+endif
 
 
 # Build the static lib for the recovery tool
@@ -101,7 +116,10 @@ LOCAL_CFLAGS += \
   -Dgenerate_uuid=busybox_generate_uuid
 LOCAL_MODULE := libbusybox
 LOCAL_MODULE_TAGS := eng
-LOCAL_STATIC_LIBRARIES := libclearsilverregex libcutils libc libm
+LOCAL_STATIC_LIBRARIES := libcutils libc libm
+ifeq ($(HAVE_CLEARSILVER),true)
+LOCAL_STATIC_LIBRARIES += libclearsilverregex
+endif
 $(LOCAL_MODULE): busybox_prepare
 include $(BUILD_STATIC_LIBRARY)
 
@@ -112,12 +130,18 @@ include $(CLEAR_VARS)
 BUSYBOX_CONFIG:=full
 BUSYBOX_SUFFIX:=bionic
 LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
+ifeq ($(BIONIC_ICS),true)
+LOCAL_SRC_FILES += android/libc/__set_errno.c
+endif
 LOCAL_C_INCLUDES := $(BUSYBOX_C_INCLUDES)
 LOCAL_CFLAGS := $(BUSYBOX_CFLAGS)
 LOCAL_MODULE := busybox
 LOCAL_MODULE_TAGS := eng
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+LOCAL_SHARED_LIBRARIES := libm
+ifeq ($(HAVE_CLEARSILVER),true)
 LOCAL_STATIC_LIBRARIES := libclearsilverregex
+endif
 $(LOCAL_MODULE): busybox_prepare
 include $(BUILD_EXECUTABLE)
 
@@ -159,10 +183,14 @@ LOCAL_CFLAGS += \
 LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE := static_busybox
 LOCAL_MODULE_TAGS := optional
-LOCAL_STATIC_LIBRARIES := libclearsilverregex libcutils libc libm
+LOCAL_STATIC_LIBRARIES := libcutils libc libm
 LOCAL_MODULE_CLASS := UTILITY_EXECUTABLES
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
 LOCAL_MODULE_STEM := busybox
+
+# not required here, present in the static libc.a
+#LOCAL_STATIC_LIBRARIES += libclearsilverregex
+
 $(LOCAL_MODULE): busybox_prepare
 include $(BUILD_EXECUTABLE)
