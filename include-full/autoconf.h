@@ -1,8 +1,8 @@
 /*
  * Automatically generated C config: don't edit
- * Busybox version: 1.19.3-cm71
+ * Busybox version: 1.19.3-cm7
  */
-#define AUTOCONF_TIMESTAMP "2011-11-03 07:47 +0100"
+#define AUTOCONF_TIMESTAMP "2011-11-14 14:01 +0100"
 
 #define CONFIG_HAVE_DOT_CONFIG 1
 #define ENABLE_HAVE_DOT_CONFIG 1
@@ -1792,10 +1792,10 @@
 #define ENABLE_DMESG 1
 #define IF_DMESG(...) __VA_ARGS__
 #define IF_NOT_DMESG(...)
-#undef CONFIG_FEATURE_DMESG_PRETTY
-#define ENABLE_FEATURE_DMESG_PRETTY 0
-#define IF_FEATURE_DMESG_PRETTY(...)
-#define IF_NOT_FEATURE_DMESG_PRETTY(...) __VA_ARGS__
+#define CONFIG_FEATURE_DMESG_PRETTY 1
+#define ENABLE_FEATURE_DMESG_PRETTY 1
+#define IF_FEATURE_DMESG_PRETTY(...) __VA_ARGS__
+#define IF_NOT_FEATURE_DMESG_PRETTY(...)
 #undef CONFIG_FBSET
 #define ENABLE_FBSET 0
 #define IF_FBSET(...)

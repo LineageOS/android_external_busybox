@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
-# Busybox version: 1.19.3-cm71
-# Thu Nov  3 07:47:30 2011
+# Busybox version: 1.19.3-cm7
+# Mon Nov 14 14:01:06 2011
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -519,7 +519,7 @@ CONFIG_REV=y
 # CONFIG_BLKID is not set
 # CONFIG_FEATURE_BLKID_TYPE is not set
 CONFIG_DMESG=y
-# CONFIG_FEATURE_DMESG_PRETTY is not set
+CONFIG_FEATURE_DMESG_PRETTY=y
 # CONFIG_FBSET is not set
 # CONFIG_FEATURE_FBSET_FANCY is not set
 # CONFIG_FEATURE_FBSET_READMODE is not set

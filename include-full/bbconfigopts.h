@@ -433,7 +433,7 @@ static const char bbconfig_config[] ALIGN1 =
 "# CONFIG_BLKID is not set\n"
 "# CONFIG_FEATURE_BLKID_TYPE is not set\n"
 "CONFIG_DMESG=y\n"
-"# CONFIG_FEATURE_DMESG_PRETTY is not set\n"
+"CONFIG_FEATURE_DMESG_PRETTY=y\n"
 "# CONFIG_FBSET is not set\n"
 "# CONFIG_FEATURE_FBSET_FANCY is not set\n"
 "# CONFIG_FEATURE_FBSET_READMODE is not set\n"
