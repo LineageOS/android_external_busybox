@@ -67,6 +67,7 @@ endif
 BUSYBOX_C_INCLUDES = \
 	$(LOCAL_PATH)/include-$(BUSYBOX_CONFIG) \
 	$(LOCAL_PATH)/include $(LOCAL_PATH)/libbb \
+	$(LOCAL_PATH)/librpc \
 	bionic/libc/private \
 	bionic/libm/include \
 	bionic/libm \

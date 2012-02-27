@@ -35,3 +35,19 @@ util-linux/switch_root.c
 
 util-linux/volume_id/get_devname.c util-linux/volume_id/volume_id.c util-linux/volume_id/util.c util-linux/volume_id/ext.c
 util-linux/volume_id/fat.c util-linux/mkfs_vfat.c
+
+librpc/auth_none.c librpc/auth_unix.c librpc/authunix_prot.c
+librpc/bindresvport.c librpc/clnt_generic.c librpc/clnt_perror.c
+librpc/clnt_raw.c librpc/clnt_simple.c librpc/clnt_tcp.c
+librpc/clnt_udp.c librpc/clnt_unix.c librpc/create_xid.c
+librpc/get_myaddress.c librpc/getrpcent.c librpc/getrpcport.c
+librpc/pmap_clnt.c librpc/pmap_prot2.c librpc/pmap_prot.c
+librpc/pmap_rmt.c librpc/pm_getmaps.c librpc/pm_getport.c
+librpc/rpc_cmsg.c librpc/rpc_commondata.c librpc/rpc_dtablesize.c
+librpc/rpc_prot.c librpc/rpc_thread.c librpc/svc_auth.c
+librpc/svc_authux.c librpc/svc.c librpc/svc_raw.c
+librpc/svc_run.c librpc/svc_simple.c librpc/svc_tcp.c
+librpc/svc_udp.c librpc/svc_unix.c librpc/xdr_array.c
+librpc/xdr.c librpc/xdr_float.c librpc/xdr_intXX_t.c
+librpc/xdr_mem.c librpc/xdr_rec.c librpc/xdr_reference.c
+librpc/xdr_stdio.c
