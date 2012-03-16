@@ -2,7 +2,7 @@
  * Automatically generated C config: don't edit
  * Busybox version: 1.19.4-cm9
  */
-#define AUTOCONF_TIMESTAMP "2012-02-05 18:41 +0100"
+#define AUTOCONF_TIMESTAMP "2012-03-17 02:23 +0100"
 
 #define CONFIG_HAVE_DOT_CONFIG 1
 #define ENABLE_HAVE_DOT_CONFIG 1
