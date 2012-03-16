@@ -152,9 +152,6 @@ extern reg_syntax_t re_syntax_options;
    | RE_NO_BK_VBAR               | RE_NO_EMPTY_RANGES			\
    | RE_UNMATCHED_RIGHT_PAREN_ORD)
 
-#define RE_SYNTAX_POSIX_AWK 						\
-  (RE_SYNTAX_POSIX_EXTENDED | RE_BACKSLASH_ESCAPE_IN_LISTS)
-
 #define RE_SYNTAX_GREP							\
   (RE_BK_PLUS_QM              | RE_CHAR_CLASSES				\
    | RE_HAT_LISTS_NOT_NEWLINE | RE_INTERVALS				\
@@ -193,6 +190,9 @@ extern reg_syntax_t re_syntax_options;
    | RE_CONTEXT_INDEP_OPS  | RE_NO_BK_BRACES				\
    | RE_NO_BK_PARENS       | RE_NO_BK_VBAR				\
    | RE_UNMATCHED_RIGHT_PAREN_ORD)
+
+#define RE_SYNTAX_POSIX_AWK						\
+  (RE_SYNTAX_POSIX_EXTENDED | RE_BACKSLASH_ESCAPE_IN_LISTS)
 
 /* Differs from ..._POSIX_EXTENDED in that RE_CONTEXT_INVALID_OPS
    replaces RE_CONTEXT_INDEP_OPS and RE_NO_BK_REFS is added.  */
