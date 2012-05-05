@@ -23,6 +23,10 @@
 //usage:       "$ taskset -p 1\n"
 //usage:       "pid 1's current affinity mask: 3\n"
 
+#ifdef BIONIC_ICS
+#define _GNU_SOURCE 1
+#endif
+
 #include <sched.h>
 #include "libbb.h"
 
@@ -86,7 +90,7 @@ int taskset_main(int argc UNUSED_PARAM, char **argv)
 	unsigned opt_p;
 	const char *current_new;
 	char *pid_str;
-	char *aff = aff; /* for compiler */
+	char *aff = NULL;
 
 	/* NB: we mimic util-linux's taskset: -p does not take
 	 * an argument, i.e., "-pN" is NOT valid, only "-p N"!
