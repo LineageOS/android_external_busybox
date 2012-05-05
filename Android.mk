@@ -9,6 +9,7 @@ BIONIC_ICS := false
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES := android/regex/regex.c
 LOCAL_C_INCLUDES := $(BB_PATH)/android/regex
+LOCAL_CFLAGS := -Wno-sign-compare
 LOCAL_MODULE := libclearsilverregex
 include $(BUILD_STATIC_LIBRARY)
 
@@ -43,8 +44,6 @@ $(BUSYBOX_CONFIG):
 	@#cp $(BB_PATH)/.config $(BB_PATH)/.config-$@
 	@mkdir -p $(BB_PATH)/include-$@
 	cp $(BB_PATH)/include/*.h $(BB_PATH)/include-$@/
-	@mkdir -p $(BB_INCLUDES_OUT)/busybox-$@
-	@cp $(BB_PATH)/include/*.h $(BB_INCLUDES_OUT)/busybox-$@/
 	@rm $(BB_PATH)/include/usage_compressed.h
 	@rm $(BB_PATH)/include/autoconf.h
 	@rm -f $(BB_PATH)/.config-old
@@ -86,7 +85,6 @@ ifeq ($(TARGET_ARCH),mips)
 endif
 
 BUSYBOX_C_INCLUDES = \
-	$(BB_INCLUDES_OUT)/busybox-$(BUSYBOX_CONFIG) \
 	$(BB_PATH)/include-$(BUSYBOX_CONFIG) \
 	$(BB_PATH)/include $(BB_PATH)/libbb \
 	bionic/libc/private \

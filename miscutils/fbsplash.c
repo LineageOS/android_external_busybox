@@ -143,8 +143,8 @@ static void fb_open(const char *strfb_device)
 
 	// map the device in memory
 	G.addr = mmap(NULL,
-		        G.scr_var.yres * G.scr_fix.line_length,
-			PROT_WRITE, MAP_SHARED, fbfd, 0);
+		        (G.scr_fix.smem_len + PAGE_SIZE - 1) & (~(PAGE_SIZE - 1)),
+			PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
 	if (G.addr == MAP_FAILED)
 		bb_perror_msg_and_die("mmap");
 
@@ -296,7 +296,7 @@ static void fb_drawprogressbar(unsigned percent)
 	pos_x = left_x;
 	if (percent > 0) {
 		int y;
-		unsigned i;
+		int i;
 
 		// actual progress bar
 		pos_x += (unsigned)(width * percent) / 100;
@@ -444,7 +444,7 @@ int fbsplash_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int fbsplash_main(int argc UNUSED_PARAM, char **argv)
 {
 	const char *fb_device, *cfg_filename, *fifo_filename;
-	FILE *fp = fp; // for compiler
+	FILE *fp = NULL;
 	char *num_buf;
 	unsigned num;
 	bool bCursorOff;
@@ -452,7 +452,7 @@ int fbsplash_main(int argc UNUSED_PARAM, char **argv)
 	INIT_G();
 
 	// parse command line options
-	fb_device = "/dev/fb0";
+	fb_device = "/dev/graphics/fb0";
 	cfg_filename = NULL;
 	fifo_filename = NULL;
 	bCursorOff = 1 & getopt32(argv, "cs:d:i:f:",
