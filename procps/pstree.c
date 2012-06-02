@@ -87,7 +87,7 @@ struct globals {
  */
 static void ensure_buffer_capacity(int bufindex)
 {
-	if ((unsigned)bufindex >= G.capacity) {
+	if (bufindex >= G.capacity) {
 		G.capacity += 0x100;
 		G.width = xrealloc(G.width, G.capacity * sizeof(G.width[0]));
 		G.more = xrealloc(G.more, G.capacity * sizeof(G.more[0]));

@@ -50,7 +50,6 @@
 #define HAVE_REGEX 1
 
 /* Does your system have pthreads? */
-#undef HAVE_PTHREADS
 #define HAVE_PTHREADS 1
 
 /* Does your system have lockf ? */

@@ -114,8 +114,8 @@ int tail_main(int argc, char **argv)
 
 	char *tailbuf;
 	size_t tailbufsize;
-	int header_threshhold = 1;
-	int nfiles;
+	unsigned header_threshhold = 1;
+	unsigned nfiles;
 	int i, opt;
 
 	int *fds;

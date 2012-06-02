@@ -71,7 +71,7 @@ int main(void)
 		} else {
 			printf(", ");
 		}
-		printf("%s", usage_array[i].aname);
+		printf(usage_array[i].aname);
 		col += len2;
 	}
 	printf("\n\n");

@@ -325,7 +325,7 @@ static char *build_row(char *p, unsigned *dp)
 	col = 0;
 	do {
 		day = *dp++;
-		if (day != (unsigned) SPACE) {
+		if (day != SPACE) {
 			if (julian) {
 				++p;
 				if (day >= 100) {

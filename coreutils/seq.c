@@ -28,7 +28,7 @@ int seq_main(int argc, char **argv)
 	};
 	double first, last, increment, v;
 	unsigned n;
-	int width;
+	unsigned width;
 	unsigned frac_part;
 	const char *sep, *opt_s = "\n";
 	unsigned opt;
@@ -70,7 +70,7 @@ int seq_main(int argc, char **argv)
 	while (1) {
 		char *dot = strchrnul(*argv, '.');
 		int w = (dot - *argv);
-		unsigned f = strlen(dot);
+		int f = strlen(dot);
 		if (width < w)
 			width = w;
 		argv++;

@@ -280,7 +280,7 @@ struct globals {
 	int last_file_modified;  // = -1;
 	int save_argc;           // how many file names on cmd line
 	int cmdcnt;              // repetition count
-	int rows, columns;       // the terminal screen is this size
+	unsigned rows, columns;	 // the terminal screen is this size
 #if ENABLE_FEATURE_VI_ASK_TERMINAL
 	int get_rowcol_error;
 #endif
@@ -648,9 +648,7 @@ static int init_text_buffer(char *fn)
 #if ENABLE_FEATURE_VI_WIN_RESIZE
 static int query_screen_dimensions(void)
 {
-	unsigned c, r;
-	int err = get_terminal_width_height(STDIN_FILENO, &c, &r);
-	columns = c; rows = r;
+	int err = get_terminal_width_height(STDIN_FILENO, &columns, &rows);
 	if (rows > MAX_SCR_ROWS)
 		rows = MAX_SCR_ROWS;
 	if (columns > MAX_SCR_COLS)
@@ -2086,7 +2084,7 @@ static uintptr_t text_hole_make(char *p, int size)	// at "p", make a 'size' byte
 		p           += bias;
 #if ENABLE_FEATURE_VI_YANKMARK
 		{
-			unsigned i;
+			int i;
 			for (i = 0; i < ARRAY_SIZE(mark); i++)
 				if (mark[i])
 					mark[i] += bias;

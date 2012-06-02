@@ -88,7 +88,7 @@ static void modinfo(const char *path, const char *version,
 		free((char*)fullpath);
 		if (!the_module) {
 			// outputs system error msg
-			bb_perror_msg("\n");
+			bb_perror_msg("");
 			return;
 		}
 	}

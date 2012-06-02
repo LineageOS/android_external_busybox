@@ -2410,15 +2410,15 @@ static var *evaluate(node *op, var *res)
 	v1 = nvalloc(2);
 
 	while (op) {
-		static struct {
+		struct {
 			var *v;
 			const char *s;
-		} L;
-		static struct {
+		} L = L; /* for compiler */
+		struct {
 			var *v;
 			const char *s;
-		} R;
-		static double L_d;
+		} R = R;
+		double L_d = L_d;
 		uint32_t opinfo;
 		int opn;
 		node *op1;
@@ -2645,7 +2645,7 @@ static var *evaluate(node *op, var *res)
 				copyvar(v, arg);
 				v->type |= VF_CHILD;
 				v->x.parent = arg;
-				if (++v - vbeg >= (int) op->r.f->nargs)
+				if (++v - vbeg >= op->r.f->nargs)
 					break;
 			}
 
@@ -2703,7 +2703,7 @@ static var *evaluate(node *op, var *res)
 
 		/* simple builtins */
 		case XC( OC_FBLTIN ): {
-			static double R_d;
+			double R_d = R_d; /* for compiler */
 
 			switch (opn) {
 			case F_in:
@@ -2914,7 +2914,7 @@ static var *evaluate(node *op, var *res)
 		}
 
 		case XC( OC_COMPARE ): {
-			static int i;
+			int i = i; /* for compiler */
 			double Ld;
 
 			if (is_numeric(L.v) && is_numeric(R.v)) {

@@ -85,7 +85,7 @@ struct stats_irq {
 struct globals {
 	int interval;
 	int count;
-	int cpu_nr;                     /* Number of CPUs */
+	unsigned cpu_nr;                /* Number of CPUs */
 	unsigned irqcpu_nr;             /* Number of interrupts per CPU */
 	unsigned softirqcpu_nr;         /* Number of soft interrupts per CPU */
 	unsigned options;
@@ -167,7 +167,7 @@ static ALWAYS_INLINE data_t jiffies_diff(data_t old, data_t new)
 	return (diff == 0) ? 1 : diff;
 }
 
-static int is_cpu_in_bitmap(int cpu)
+static int is_cpu_in_bitmap(unsigned cpu)
 {
 	return G.cpu_bitmap[cpu >> 3] & (1 << (cpu & 7));
 }
@@ -462,7 +462,7 @@ static void get_cpu_statistics(struct stats_cpu *cpu, data_t *up, data_t *up0)
 
 	while (fgets(buf, sizeof(buf), fp)) {
 		data_t sum;
-		int cpu_number;
+		unsigned cpu_number;
 		struct stats_cpu *cp;
 
 		if (!starts_with_cpu(buf))
@@ -549,8 +549,8 @@ static void get_irqs_from_interrupts(const char *fname,
 	struct stats_irqcpu *ic;
 	char *buf;
 	unsigned buflen;
-	int cpu;
-	int irq;
+	unsigned cpu;
+	unsigned irq;
 	int cpu_index[G.cpu_nr];
 	int iindex;
 
@@ -605,7 +605,7 @@ static void get_irqs_from_interrupts(const char *fname,
 
 		ic = &per_cpu_stats[current][irq];
 		len = cp - buf;
-		if (len >= (int) sizeof(ic->irq_name)) {
+		if (len >= sizeof(ic->irq_name)) {
 			len = sizeof(ic->irq_name) - 1;
 		}
 		safe_strncpy(ic->irq_name, buf, len + 1);
@@ -672,7 +672,7 @@ static void alarm_handler(int sig UNUSED_PARAM)
 static void main_loop(void)
 {
 	unsigned current;
-	int cpus;
+	unsigned cpus;
 
 	/* Read the stats */
 	if (G.cpu_nr > 1) {
@@ -816,7 +816,7 @@ static int get_irqcpu_nr(const char *f, int max_irqs)
 	FILE *fp;
 	char *line;
 	unsigned linelen;
-	int irq;
+	unsigned irq;
 
 	fp = fopen_for_read(f);
 	if (!fp)  /* No interrupts file */
@@ -939,7 +939,7 @@ int mpstat_main(int UNUSED_PARAM argc, char **argv)
 				memset(G.cpu_bitmap, 0xff, G.cpu_bitmap_len);
 			} else {
 				/* Get CPU number */
-				int n = xatoi_positive(t);
+				unsigned n = xatoi_positive(t);
 				if (n >= G.cpu_nr)
 					bb_error_msg_and_die("not that many processors");
 				n++;

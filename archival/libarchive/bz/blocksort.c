@@ -828,7 +828,7 @@ void mainSort(EState* state,
 		int32_t vv;
 		/* bbox: was: int32_t h = 1; */
 		/* do h = 3 * h + 1; while (h <= 256); */
-		int32_t h = 364;
+		uint32_t h = 364;
 
 		do {
 			/*h = h / 3;*/
