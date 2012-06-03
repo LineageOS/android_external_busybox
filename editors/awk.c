@@ -2410,11 +2410,11 @@ static var *evaluate(node *op, var *res)
 	v1 = nvalloc(2);
 
 	while (op) {
-		static struct {
+		struct {
 			var *v;
 			const char *s;
 		} L;
-		static struct {
+		struct {
 			var *v;
 			const char *s;
 		} R;
@@ -2914,7 +2914,7 @@ static var *evaluate(node *op, var *res)
 		}
 
 		case XC( OC_COMPARE ): {
-			static int i;
+			int i = 0;
 			double Ld;
 
 			if (is_numeric(L.v) && is_numeric(R.v)) {
