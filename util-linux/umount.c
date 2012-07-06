@@ -52,11 +52,10 @@ static struct mntent *getmntent_r(FILE* stream, struct mntent* result,
  * thus, on many systems, bare umount _does_ drop loop devices.
  * (2) many users request this feature.
  */
-#define OPTION_STRING           "fldDnra" "vt:i"
+#define OPTION_STRING           "fldnra" "vt:i"
 #define OPT_FORCE               (1 << 0) // Same as MNT_FORCE
 #define OPT_LAZY                (1 << 1) // Same as MNT_DETACH
-//#define OPT_FREE_LOOP           (1 << 2) // -d is assumed always present
-#define OPT_DONT_FREE_LOOP      (1 << 3)
+#define OPT_FREE_LOOP           (1 << 2) // -d is assumed always present
 #define OPT_NO_MTAB             (1 << 4)
 #define OPT_REMOUNT             (1 << 5)
 #define OPT_ALL                 (ENABLE_FEATURE_UMOUNT_ALL ? (1 << 6) : 0)
