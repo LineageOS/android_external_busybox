@@ -357,6 +357,7 @@ enum {	/* DO NOT CHANGE THESE VALUES!  cp.c, mv.c, install.c depend on them. */
 	FILEUTILS_PRESERVE_SECURITY_CONTEXT = 1 << 9, /* -c */
 	FILEUTILS_SET_SECURITY_CONTEXT = 1 << 10,
 #endif
+	FILEUTILS_IGNORE_CHMOD_ERR = 1 << 11,
 };
 #define FILEUTILS_CP_OPTSTR "pdRfilsLH" IF_SELINUX("c")
 extern int remove_file(const char *path, int flags) FAST_FUNC;
@@ -1310,6 +1311,7 @@ int sd_listen_fds(void);
 #define SETUP_ENV_CHANGEENV (1 << 0)
 #define SETUP_ENV_CLEARENV  (1 << 1)
 #define SETUP_ENV_TO_TMP    (1 << 2)
+#define SETUP_ENV_NO_CHDIR  (1 << 4)
 extern void setup_environment(const char *shell, int flags, const struct passwd *pw) FAST_FUNC;
 extern int correct_password(const struct passwd *pw) FAST_FUNC;
 /* Returns a malloced string */

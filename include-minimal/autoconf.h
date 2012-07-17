@@ -1,8 +1,8 @@
 /*
  * Automatically generated C config: don't edit
- * Busybox version: 1.20.1-cm7
+ * Busybox version: 1.20.2-cm7
  */
-#define AUTOCONF_TIMESTAMP "2012-05-28 03:57 +0200"
+#define AUTOCONF_TIMESTAMP "2012-07-17 15:19 +0200"
 
 #define CONFIG_HAVE_DOT_CONFIG 1
 #define ENABLE_HAVE_DOT_CONFIG 1
@@ -1284,10 +1284,6 @@
 #define ENABLE_FEATURE_VI_ASK_TERMINAL 0
 #define IF_FEATURE_VI_ASK_TERMINAL(...)
 #define IF_NOT_FEATURE_VI_ASK_TERMINAL(...) __VA_ARGS__
-#undef CONFIG_FEATURE_VI_OPTIMIZE_CURSOR
-#define ENABLE_FEATURE_VI_OPTIMIZE_CURSOR 0
-#define IF_FEATURE_VI_OPTIMIZE_CURSOR(...)
-#define IF_NOT_FEATURE_VI_OPTIMIZE_CURSOR(...) __VA_ARGS__
 #define CONFIG_AWK 1
 #define ENABLE_AWK 1
 #define IF_AWK(...) __VA_ARGS__
