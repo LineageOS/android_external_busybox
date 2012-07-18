@@ -1,0 +1,10 @@
+Change-Id: I81ea07398fa96c8349c26f7903485a73e062eae3
+Code-Review+2: Tanguy Pruvot <tanguy.pruvot@gmail.com>
+Verified+1: Tanguy Pruvot <tanguy.pruvot@gmail.com>
+Code-Review+1: Taichi Nishimura <fuzzzzzzzzzzzzzzzzzz@gmail.com>
+Code-Review+1: Yanuar Harry <ai.the.smarties.physics@gmail.com>
+Submitted-by: Tanguy Pruvot <tanguy.pruvot@gmail.com>
+Submitted-at: Wed, 18 Jul 2012 21:11:23 +0400
+Reviewed-on: http://review.cyanogenmod.com/19351
+Project: CyanogenMod/android_external_busybox
+Branch: refs/heads/gingerbread
