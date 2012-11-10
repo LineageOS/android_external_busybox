@@ -4,6 +4,9 @@ BB_PATH := $(LOCAL_PATH)
 # Bionic Branches Switches (CM7/AOSP/ICS)
 BIONIC_ICS := true
 
+ifeq ($(TARGET_ARCH),x86)
+CONFIG_PREFIX="-x86"
+endif
 
 # Make a static library for regex.
 include $(CLEAR_VARS)
@@ -35,7 +38,7 @@ include $(CLEAR_VARS)
 # Execute make clean, make prepare and copy profiles required for normal & static lib (recovery)
 
 KERNEL_MODULES_DIR ?= /system/lib/modules
-BUSYBOX_CONFIG := minimal full
+BUSYBOX_CONFIG := minimal full minimal-x86 full-x86
 $(BUSYBOX_CONFIG):
 	@echo -e ${CL_PFX}"prepare config for busybox $@ profile"${CL_RST}
 	@cd $(BB_PATH) && make clean
@@ -111,7 +114,7 @@ endif
 
 # Build the static lib for the recovery tool
 
-BUSYBOX_CONFIG:=minimal
+BUSYBOX_CONFIG:="minimal$(CONFIG_PREFIX)"
 BUSYBOX_SUFFIX:=static
 LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
 LOCAL_C_INCLUDES := $(BUSYBOX_C_INCLUDES)
@@ -136,7 +139,7 @@ include $(BUILD_STATIC_LIBRARY)
 LOCAL_PATH := $(BB_PATH)
 include $(CLEAR_VARS)
 
-BUSYBOX_CONFIG:=full
+BUSYBOX_CONFIG:="full$(CONFIG_PREFIX)"
 BUSYBOX_SUFFIX:=bionic
 LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
 ifeq ($(BIONIC_ICS),true)
@@ -176,7 +179,7 @@ ALL_MODULES.$(LOCAL_MODULE).INSTALLED := \
 LOCAL_PATH := $(BB_PATH)
 include $(CLEAR_VARS)
 
-BUSYBOX_CONFIG:=full
+BUSYBOX_CONFIG:="full$(CONFIG_PREFIX)"
 BUSYBOX_SUFFIX:=static
 LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
 LOCAL_C_INCLUDES := $(BUSYBOX_C_INCLUDES)
