@@ -46,6 +46,7 @@
 #include "libbb.h"
 #include <math.h>
 #include <netinet/ip.h> /* For IPTOS_LOWDELAY definition */
+#include <sys/resource.h> /* setpriority */
 #ifdef __BIONIC__
 #include <linux/timex.h>
 extern int adjtimex (struct timex *);
