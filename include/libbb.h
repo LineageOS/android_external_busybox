@@ -12,14 +12,6 @@
 
 #include "platform.h"
 
-/* We miss some syscalls on x86, stub them here */
-#if defined __i386__
-# define swapon(...) 0
-# define swapoff(...) 0
-# define getsid(...) 0
-# define stime(...) 0
-#endif
-
 #ifdef __BIONIC__
 /* work around "extern inline" (under std=gnu99) ctype definitions we don't use anyway */
 # ifdef NDEBUG

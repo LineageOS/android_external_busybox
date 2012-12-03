@@ -977,9 +977,7 @@ MRPROPER_FILES += .config .config.old include/asm .version .old_version \
 		  busybox_old
 
 MRPROPER_FILES += include-full/*.h \
-                  include-minimal/*.h \
-                  include-full-x86/*.h \
-                  include-minimal-x86/*.h
+                  include-minimal/*.h
 
 # clean - Delete most, but leave enough to build external modules
 #
