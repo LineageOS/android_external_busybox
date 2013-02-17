@@ -35,13 +35,17 @@ include $(CLEAR_VARS)
 
 # Execute make clean, make prepare and copy profiles required for normal & static lib (recovery)
 
+
+# Required to change x86 arm-eabi- to i686-android-linux- in .config
+BB_CROSS_COMPILE := $(shell basename $(TARGET_TOOLS_PREFIX))
+
 KERNEL_MODULES_DIR ?= /system/lib/modules
 BUSYBOX_CONFIG := minimal full
 $(BUSYBOX_CONFIG):
 	@echo -e ${CL_PFX}"prepare config for busybox $@ profile"${CL_RST}
 	@cd $(BB_PATH) && make clean
 	@cd $(BB_PATH) && git clean -f -- ./include-$@/
-	cp $(BB_PATH)/.config-$@ $(BB_PATH)/.config
+	sed 's/arm-eabi-/$(BB_CROSS_COMPILE)/g' $(BB_PATH)/.config-$@ > $(BB_PATH)/.config
 	cd $(BB_PATH) && make prepare
 	@#cp $(BB_PATH)/.config $(BB_PATH)/.config-$@
 	@mkdir -p $(BB_PATH)/include-$@
