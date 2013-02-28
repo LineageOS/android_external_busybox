@@ -35,15 +35,21 @@ include $(CLEAR_VARS)
 
 # Execute make clean, make prepare and copy profiles required for normal & static lib (recovery)
 
+
+# Required to change arm-eabi- in .config, but keep the alias on arm (not arm-linux-androideabi-)
+BB_CROSS_COMPILE := $(shell basename $(TARGET_TOOLS_PREFIX))
+ifeq ($(TARGET_ARCH),arm)
+    BB_CROSS_COMPILE = arm-eabi-
+endif
+
 KERNEL_MODULES_DIR ?= /system/lib/modules
 BUSYBOX_CONFIG := minimal full
 $(BUSYBOX_CONFIG):
 	@echo -e ${CL_PFX}"prepare config for busybox $@ profile"${CL_RST}
 	@cd $(BB_PATH) && make clean
 	@cd $(BB_PATH) && git clean -f -- ./include-$@/
-	cp $(BB_PATH)/.config-$@ $(BB_PATH)/.config
+	@sed 's/arm-eabi-/$(BB_CROSS_COMPILE)/g' $(BB_PATH)/.config-$@ > $(BB_PATH)/.config
 	cd $(BB_PATH) && make prepare
-	@#cp $(BB_PATH)/.config $(BB_PATH)/.config-$@
 	@mkdir -p $(BB_PATH)/include-$@
 	cp $(BB_PATH)/include/*.h $(BB_PATH)/include-$@/
 	@rm $(BB_PATH)/include/usage_compressed.h
@@ -66,25 +72,13 @@ SUBMAKE := make -s -C $(BB_PATH) CC=$(CC)
 BUSYBOX_SRC_FILES = $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).sources) \
 	libbb/android.c
 
-ifeq ($(TARGET_ARCH),arm)
-	BUSYBOX_SRC_FILES += \
-	android/libc/arch-arm/syscalls/adjtimex.S \
-	android/libc/arch-arm/syscalls/getsid.S \
-	android/libc/arch-arm/syscalls/stime.S \
-	android/libc/arch-arm/syscalls/swapon.S \
-	android/libc/arch-arm/syscalls/swapoff.S \
-	android/libc/arch-arm/syscalls/sysinfo.S
-endif
-
-ifeq ($(TARGET_ARCH),mips)
-	BUSYBOX_SRC_FILES += \
-	android/libc/arch-mips/syscalls/adjtimex.S \
-	android/libc/arch-mips/syscalls/getsid.S \
-	android/libc/arch-mips/syscalls/stime.S \
-	android/libc/arch-mips/syscalls/swapon.S \
-	android/libc/arch-mips/syscalls/swapoff.S \
-	android/libc/arch-mips/syscalls/sysinfo.S
-endif
+BUSYBOX_SRC_FILES += \
+	android/libc/arch-$(TARGET_ARCH)/syscalls/adjtimex.S \
+	android/libc/arch-$(TARGET_ARCH)/syscalls/getsid.S \
+	android/libc/arch-$(TARGET_ARCH)/syscalls/stime.S \
+	android/libc/arch-$(TARGET_ARCH)/syscalls/swapon.S \
+	android/libc/arch-$(TARGET_ARCH)/syscalls/swapoff.S \
+	android/libc/arch-$(TARGET_ARCH)/syscalls/sysinfo.S
 
 BUSYBOX_C_INCLUDES = \
 	$(BB_PATH)/include-$(BUSYBOX_CONFIG) \
