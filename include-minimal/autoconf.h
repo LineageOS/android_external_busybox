@@ -2,7 +2,7 @@
  * Automatically generated C config: don't edit
  * Busybox version: 1.21.0-jb
  */
-#define AUTOCONF_TIMESTAMP "2013-02-26 19:21 +0100"
+#define AUTOCONF_TIMESTAMP "2013-03-03 02:50 +0100"
 
 #define CONFIG_HAVE_DOT_CONFIG 1
 #define ENABLE_HAVE_DOT_CONFIG 1
@@ -204,7 +204,6 @@
 #define ENABLE_LFS 0
 #define IF_LFS(...)
 #define IF_NOT_LFS(...) __VA_ARGS__
-#define CONFIG_CROSS_COMPILER_PREFIX "arm-eabi-"
 #define ENABLE_CROSS_COMPILER_PREFIX 1
 #define IF_CROSS_COMPILER_PREFIX(...) __VA_ARGS__
 #define IF_NOT_CROSS_COMPILER_PREFIX(...)

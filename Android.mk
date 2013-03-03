@@ -1,7 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 BB_PATH := $(LOCAL_PATH)
 
-# Bionic Branches Switches (CM7/AOSP/ICS)
+# Bionic variant switch (ICS+)
 BIONIC_ICS := true
 
 
@@ -49,11 +49,15 @@ $(BUSYBOX_CONFIG):
 	@cd $(BB_PATH) && make clean
 	@cd $(BB_PATH) && git clean -f -- ./include-$@/
 	@sed 's/arm-eabi-/$(BB_CROSS_COMPILE)/g' $(BB_PATH)/.config-$@ > $(BB_PATH)/.config
+	@rm -f $(BB_PATH)/include-$@/*.h
 	cd $(BB_PATH) && make prepare
 	@mkdir -p $(BB_PATH)/include-$@
 	cp $(BB_PATH)/include/*.h $(BB_PATH)/include-$@/
+	@cat $(BB_PATH)/include/autoconf.h | grep -v CONFIG_CROSS_COMPILER_PREFIX  > $(BB_PATH)/include-$@/autoconf.h
+	@cat $(BB_PATH)/include/bbconfigopts.h | grep -v CONFIG_CROSS_COMPILER_PREFIX  > $(BB_PATH)/include-$@/bbconfigopts.h
 	@rm $(BB_PATH)/include/usage_compressed.h
 	@rm $(BB_PATH)/include/autoconf.h
+	@rm $(BB_PATH)/include/bbconfigopts.h
 	@rm -f $(BB_PATH)/.config-old
 
 busybox_prepare: $(BUSYBOX_CONFIG)
@@ -96,6 +100,7 @@ BUSYBOX_CFLAGS = \
 	-DANDROID \
 	-fno-strict-aliasing \
 	-include include-$(BUSYBOX_CONFIG)/autoconf.h \
+	-D'CONFIG_CROSS_COMPILER_PREFIX="$(BB_CROSS_COMPILE)"' \
 	-D'CONFIG_DEFAULT_MODULES_DIR="$(KERNEL_MODULES_DIR)"' \
 	-D'BB_VER="$(strip $(shell $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
 
