@@ -94,8 +94,8 @@
 #if ENABLE_SELINUX
 # include <selinux/selinux.h>
 # include <selinux/context.h>
-# include <selinux/flask.h>
-# include <selinux/av_permissions.h>
+//# include <selinux/flask.h>
+//# include <selinux/av_permissions.h>
 #endif
 #if ENABLE_FEATURE_UTMP
 # include <utmp.h>
