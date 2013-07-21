@@ -51,7 +51,6 @@
 //usage:	)
 
 #include <selinux/context.h>
-#include <selinux/flask.h>
 
 #include "libbb.h"
 
