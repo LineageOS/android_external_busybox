@@ -180,24 +180,27 @@ int sestatus_main(int argc UNUSED_PARAM, char **argv)
 	printf(COL_FMT "%s\n", "Current mode:",
 	       rc == 0 ? "permissive" : "enforcing");
 
+#ifndef __BIONIC__
 	/* Mode from config file: line */
 	if (selinux_getenforcemode(&rc) != 0)
 		goto error;
 	printf(COL_FMT "%s\n", "Mode from config file:",
 	       rc < 0 ? "disabled" : (rc == 0 ? "permissive" : "enforcing"));
-
+#endif
 	/* Policy version: line */
 	rc = security_policyvers();
 	if (rc < 0)
 		goto error;
 	printf(COL_FMT "%u\n", "Policy version:", rc);
 
+#ifndef __BIONIC__
 	/* Policy from config file: line */
 	pol_path = selinux_policy_root();
 	if (!pol_path)
 		goto error;
 	printf(COL_FMT "%s\n", "Policy from config file:",
 	       bb_basename(pol_path));
+#endif
 
 	if (opts & OPT_BOOLEAN)
 		display_boolean();

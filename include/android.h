@@ -64,4 +64,9 @@ const char *hasmntopt(const struct mntent *, const char *);
 #define _SOCKLEN_T_DECLARED
 typedef int socklen_t;
 
+/* Set flags controlling operation of matchpathcon_init or matchpathcon. */
+#define MATCHPATHCON_BASEONLY 1 /* Only process the base file_contexts file. */
+#define MATCHPATHCON_NOTRANS  2 /* Do not perform any context translation. */
+#define MATCHPATHCON_VALIDATE 4 /* Validate/canonicalize contexts at init time. */
+
 #endif

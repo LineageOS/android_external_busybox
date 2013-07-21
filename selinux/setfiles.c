@@ -629,7 +629,7 @@ int setfiles_main(int argc UNUSED_PARAM, char **argv)
 		input_filename = "-";
 		add_assoc = 0;
 	}
-
+#ifndef __BIONIC__
 	if (applet_name[0] == 's') { /* setfiles */
 		/* Use our own invalid context checking function so that
 		 * we can support either checking against the active policy or
@@ -650,7 +650,7 @@ int setfiles_main(int argc UNUSED_PARAM, char **argv)
 			exit(EXIT_FAILURE);
 		argv++;
 	}
-
+#endif
 	if (input_filename) {
 		ssize_t len;
 		FILE *f = stdin;
