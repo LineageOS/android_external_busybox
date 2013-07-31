@@ -43,7 +43,7 @@
 //usage:     "\n	-p DIR	Use DIR as a base directory (implies -t)"
 //usage:     "\n	-u	Do not create anything; print a name"
 //usage:     "\n"
-//usage:     "\nBase directory is: -p DIR, else $TMPDIR, else /tmp"
+//usage:     "\nBase directory is: -p DIR, else $TMPDIR, else /data/local/tmp"
 //usage:
 //usage:#define mktemp_example_usage
 //usage:       "$ mktemp /tmp/temp.XXXXXX\n"
@@ -69,7 +69,7 @@ int mktemp_main(int argc UNUSED_PARAM, char **argv)
 
 	path = getenv("TMPDIR");
 	if (!path || path[0] == '\0')
-		path = "/tmp";
+		path = "/data/local/tmp";
 
 	opt_complementary = "?1"; /* 1 argument max */
 	opts = getopt32(argv, "dqtp:u", &path);
@@ -89,13 +89,19 @@ int mktemp_main(int argc UNUSED_PARAM, char **argv)
 		goto error;
 	}
 #endif
-	if (opts & (OPT_t|OPT_p))
+	if (opts & (OPT_t|OPT_p) && !(opts & OPT_u))
 		chp = concat_path_file(path, chp);
 
 	if (opts & OPT_u) {
-		chp = mktemp(chp);
+		int maxlen = strlen(path) + strlen(chp) + 1;
+
+		chp = tempnam(path, chp);
 		if (chp[0] == '\0')
 			goto error;
+
+		/* Remove extra numbers */
+		chp[maxlen] = '\0';
+
 	} else if (opts & OPT_d) {
 		if (mkdtemp(chp) == NULL)
 			goto error;
