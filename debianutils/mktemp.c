@@ -68,8 +68,9 @@ int mktemp_main(int argc UNUSED_PARAM, char **argv)
 	};
 
 	path = getenv("TMPDIR");
-	if (!path || path[0] == '\0')
-		path = "/tmp";
+	if (!path || path[0] == '\0') {
+		path = "data/local/tmp";
+	}
 
 	opt_complementary = "?1"; /* 1 argument max */
 	opts = getopt32(argv, "dqtp:u", &path);
@@ -93,7 +94,7 @@ int mktemp_main(int argc UNUSED_PARAM, char **argv)
 		chp = concat_path_file(path, chp);
 
 	if (opts & OPT_u) {
-		chp = mktemp(chp);
+		chp = tempnam("", chp);
 		if (chp[0] == '\0')
 			goto error;
 	} else if (opts & OPT_d) {
