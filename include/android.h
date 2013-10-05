@@ -15,6 +15,11 @@
 # include <math.h>
 #endif
 
+/* lutimes doesnt exists in libc */
+#if ENABLE_FEATURE_TOUCH_NODEREF
+# define lutimes utimes
+#endif
+
 #define killpg_busybox(P, S) kill(-(P), S)
 
 #define setmntent fopen
