@@ -113,6 +113,8 @@ BUSYBOX_C_INCLUDES = \
 	bionic/libm/include \
 	bionic/libm \
 	libc/kernel/common \
+	external/libselinux/include \
+	external/libsepol/include \
 	$(BB_PATH)/android/regex \
 	$(BB_PATH)/android/librpc
 
@@ -148,7 +150,7 @@ LOCAL_CFLAGS += \
   -Dgenerate_uuid=busybox_generate_uuid
 LOCAL_MODULE := libbusybox
 LOCAL_MODULE_TAGS := eng debug
-LOCAL_STATIC_LIBRARIES := libcutils libc libm
+LOCAL_STATIC_LIBRARIES := libcutils libc libm libselinux libsepol
 $(LOCAL_MODULE): busybox_prepare
 include $(BUILD_STATIC_LIBRARY)
 
@@ -171,7 +173,7 @@ LOCAL_MODULE := busybox
 LOCAL_MODULE_TAGS := eng debug
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
 LOCAL_SHARED_LIBRARIES := libc libcutils libm
-LOCAL_STATIC_LIBRARIES := libclearsilverregex libuclibcrpc
+LOCAL_STATIC_LIBRARIES := libclearsilverregex libuclibcrpc libselinux libsepol
 $(LOCAL_MODULE): busybox_prepare
 include $(BUILD_EXECUTABLE)
 
@@ -217,7 +219,7 @@ LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE := static_busybox
 LOCAL_MODULE_STEM := busybox
 LOCAL_MODULE_TAGS := optional
-LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc
+LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc libselinux libsepol
 LOCAL_MODULE_CLASS := UTILITY_EXECUTABLES
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
