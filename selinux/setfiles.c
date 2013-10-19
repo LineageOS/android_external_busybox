@@ -275,6 +275,9 @@ static int match(const char *name, struct stat *sb, char **con)
 		name += rootpathlen;
 	}
 
+#ifdef __BIONIC__
+	matchpathcon_init(tmp_path);
+#endif
 	free(tmp_path);
 	if (rootpath != NULL && name[0] == '\0')
 		/* this is actually the root dir of the alt root */
@@ -315,7 +318,7 @@ static int restore(const char *file)
 	i = match(my_file, &my_sb, &newcon);
 
 	if (i < 0) /* No matching specification. */
-		goto out;
+		goto skip;
 
 	if (FLAG_p_progress) {
 		count++;
@@ -341,8 +344,13 @@ static int restore(const char *file)
 
 		if (j != i) {
 			/* There was already an association and it took precedence. */
-			goto out;
+			goto skip;
 		}
+	}
+
+	if (!newcon) {
+		bb_error_msg("match(%s) did not return a new context", my_file);
+		goto skip;
 	}
 
 	if (FLAG_d_debug)
@@ -417,6 +425,7 @@ static int restore(const char *file)
  out:
 	freecon(context);
 	freecon(newcon);
+ skip:
 	free(my_file);
 	return retval;
  err:
@@ -481,6 +490,11 @@ static int canoncon(const char *path, unsigned lineno, char **contextp)
 
 	return invalid;
 }
+
+#ifdef __BIONIC__
+/* callback function (_android suffix defined in android .h) */
+static int canoncon_android(security_context_t *ctx) { return 0; }
+#endif
 
 static int process_one(char *name)
 {
