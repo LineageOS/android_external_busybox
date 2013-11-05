@@ -39,9 +39,11 @@ int reboot_main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+#if 0 // This isn't supported anymore. Sync, always
     if(nosync)
         /* also set NO_REMOUNT_RO as remount ro includes an implicit sync */
         flags = ANDROID_RB_FLAG_NO_SYNC | ANDROID_RB_FLAG_NO_REMOUNT_RO;
+#endif
 
     if(poweroff)
         ret = android_reboot(ANDROID_RB_POWEROFF, flags, 0);
