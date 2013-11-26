@@ -158,6 +158,21 @@ static struct mntent *getmntent_r(FILE* stream, struct mntent* result,
 }
 #endif
 
+#ifdef __BIONIC__
+// Mark the given block device as ro(1) or rw(0), using the BLKROSET ioctl.
+static void fs_set_blk_rw(const char *blockdev, int readonly)
+{
+	int fd = open(blockdev, O_RDONLY);
+
+	if (fd < 0) {
+		// should never happen
+		return;
+	}
+
+	ioctl(fd, BLKROSET, &readonly);
+	close(fd);
+}
+#endif
 
 // Not real flags, but we want to be able to check for this.
 enum {
@@ -580,6 +595,13 @@ static int mount_it_now(struct mntent *mp, unsigned long vfsflags, char *filtero
 				vfsflags, filteropts);
 		goto mtab;
 	}
+
+#ifdef __BIONIC__
+	// Since KitKat, remount require perms on blockdev too
+	if (vfsflags & MS_REMOUNT)  {
+		fs_set_blk_rw(mp->mnt_fsname, ((vfsflags & MS_RDONLY) != 0) & 1);
+	}
+#endif
 
 	// Mount, with fallback to read-only if necessary.
 	for (;;) {
