@@ -46,5 +46,5 @@ util-linux/more.c util-linux/mount.c util-linux/rdev.c util-linux/rev.c util-lin
 
 util-linux/volume_id/get_devname.c util-linux/volume_id/volume_id.c util-linux/volume_id/util.c util-linux/volume_id/ext.c
 util-linux/volume_id/fat.c util-linux/volume_id/iso9660.c util-linux/volume_id/ntfs.c util-linux/volume_id/linux_swap.c
-util-linux/volume_id/exfat.c util-linux/volume_id/squashfs.c
+util-linux/volume_id/exfat.c util-linux/volume_id/squashfs.c util-linux/volume_id/f2fs.c
 
