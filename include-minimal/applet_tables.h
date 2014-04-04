@@ -520,5 +520,3 @@ const uint16_t applet_nameofs[] ALIGN2 = {
 0x0412,
 };
 
-
-#define MAX_APPLET_NAME_LEN 11

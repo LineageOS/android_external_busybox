@@ -117,6 +117,7 @@
 #include "xregex.h"
 #endif
 
+#define toInt(u) (int) (INT_MAX & u)
 
 #define ESC "\033"
 /* The escape codes for highlighted and normal text */
@@ -157,9 +158,9 @@ struct globals {
 	int less_gets_pos;
 /* last position in last line, taking into account tabs */
 	size_t last_line_pos;
-	unsigned max_fline;
-	unsigned max_lineno; /* this one tracks linewrap */
-	unsigned max_displayed_line;
+	int max_fline;
+	int max_lineno; /* this one tracks linewrap */
+	int max_displayed_line;
 	unsigned width;
 #if ENABLE_FEATURE_LESS_WINCH
 	unsigned winch_counter;
@@ -335,7 +336,7 @@ static void re_wrap(void)
 				dst_idx++;
 				if (new_line_pos < w) {
 					/* if we came here thru "goto next_new" */
-					if (src_idx > (int) max_fline)
+					if (src_idx > max_fline)
 						break;
 					lineno = LINENO(s);
 				}
@@ -351,7 +352,7 @@ static void re_wrap(void)
 			new_cur_fline = dst_idx;
 		src_idx++;
 		/* no more lines? finish last new line (and exit the loop) */
-		if (src_idx > (int) max_fline)
+		if (src_idx > max_fline)
 			goto next_new;
 		s = old_flines[src_idx];
 		if (lineno != LINENO(s)) {
@@ -410,7 +411,7 @@ static void read_lines(void)
 	int w = width;
 	char last_terminated = terminated;
 #if ENABLE_FEATURE_LESS_REGEXP
-	unsigned old_max_fline = max_fline;
+	int old_max_fline = max_fline;
 	time_t last_time = 0;
 	unsigned seconds_p1 = 3; /* seconds_to_loop + 1 */
 #endif
@@ -464,7 +465,7 @@ static void read_lines(void)
 					new_last_line_pos += 7;
 					new_last_line_pos &= (~7);
 				}
-				if ((int)new_last_line_pos >= w)
+				if (toInt(new_last_line_pos) >= w)
 					break;
 				last_line_pos = new_last_line_pos;
 			}
@@ -503,7 +504,7 @@ static void read_lines(void)
 		if (!(option_mask32 & FLAG_S)
 		  ? (max_fline > cur_fline + max_displayed_line)
 		  : (max_fline >= cur_fline
-		     && max_lineno > LINENO(flines[cur_fline]) + max_displayed_line)
+		     && max_lineno > toInt(LINENO(flines[cur_fline])) + max_displayed_line)
 		) {
 #if !ENABLE_FEATURE_LESS_REGEXP
 			break;
@@ -562,7 +563,7 @@ static void read_lines(void)
  * on my build. */
 static int calc_percent(void)
 {
-	unsigned p = (100 * (cur_fline+max_displayed_line+1) + max_fline/2) / (max_fline+1);
+	int p = (100 * (cur_fline+max_displayed_line+1) + max_fline/2) / (max_fline+1);
 	return p <= 100 ? p : 100;
 }
 
@@ -581,7 +582,7 @@ static void m_status_print(void)
 	printf(" lines %i-%i/%i ",
 			cur_fline + 1, cur_fline + max_displayed_line + 1,
 			max_fline + 1);
-	if (cur_fline >= (int)(max_fline - max_displayed_line)) {
+	if (cur_fline >= (max_fline - max_displayed_line)) {
 		printf("(END)"NORMAL);
 		if (num_files > 1 && current_file != num_files)
 			printf(HIGHLIGHT" - next: %s"NORMAL, files[current_file]);
@@ -610,7 +611,7 @@ static void status_print(void)
 #endif
 
 	clear_line();
-	if (cur_fline && cur_fline < (int)(max_fline - max_displayed_line)) {
+	if (cur_fline && cur_fline < (max_fline - max_displayed_line)) {
 		bb_putchar(':');
 		return;
 	}
@@ -787,7 +788,7 @@ static void print_ascii(const char *str)
 /* Print the buffer */
 static void buffer_print(void)
 {
-	unsigned i;
+	int i;
 
 	move_cursor(0, 0);
 	for (i = 0; i <= max_displayed_line; i++)
@@ -800,7 +801,7 @@ static void buffer_print(void)
 
 static void buffer_fill_and_print(void)
 {
-	unsigned i;
+	int i;
 #if ENABLE_FEATURE_LESS_DASHCMD
 	int fpos = cur_fline;
 
@@ -883,7 +884,7 @@ static void open_file_and_read_lines(void)
 /* Reinitialize everything for a new file - free the memory and start over */
 static void reinitialize(void)
 {
-	unsigned i;
+	int i;
 
 	if (flines) {
 		for (i = 0; i <= max_fline; i++)
@@ -927,7 +928,7 @@ static int64_t getch_nowait(void)
 	if (!(option_mask32 & FLAG_S)
 	   ? !(max_fline > cur_fline + max_displayed_line)
 	   : !(max_fline >= cur_fline
-	       && max_lineno > LINENO(flines[cur_fline]) + max_displayed_line)
+	       && max_lineno > toInt(LINENO(flines[cur_fline])) + max_displayed_line)
 	) {
 		if (eof_error > 0) /* did NOT reach eof yet */
 			rd = 0; /* yes, we are interested in stdin */
@@ -1157,7 +1158,7 @@ static void fill_match_lines(unsigned pos)
 	if (!pattern_valid)
 		return;
 	/* Run the regex on each line of the current file */
-	while (pos <= max_fline) {
+	while (toInt(pos) <= max_fline) {
 		/* If this line matches */
 		if (regexec(&pattern, flines[pos], 0, NULL, 0) == 0
 		/* and we didn't match it last time */
@@ -1367,7 +1368,7 @@ static void save_input_to_file(void)
 {
 	const char *msg = "";
 	char *current_line;
-	unsigned i;
+	int i;
 	FILE *fp;
 
 	print_statusline("Log file: ");
@@ -1608,6 +1609,9 @@ static void sigwinch_handler(int sig UNUSED_PARAM)
 int less_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int less_main(int argc, char **argv)
 {
+	char *tty_name;
+	int tty_fd;
+
 	INIT_G();
 
 	/* TODO: -x: do not interpret backspace, -xx: tab also */
@@ -1637,10 +1641,28 @@ int less_main(int argc, char **argv)
 	if (option_mask32 & FLAG_TILDE)
 		empty_line_marker = "";
 
-	kbd_fd = open(CURRENT_TTY, O_RDONLY);
-	if (kbd_fd < 0)
-		return bb_cat(argv);
-	ndelay_on(kbd_fd);
+	/* Some versions of less can survive w/o controlling tty,
+	 * try to do the same. This also allows to specify an alternative
+	 * tty via "less 1<>TTY".
+	 * We don't try to use STDOUT_FILENO directly,
+	 * since we want to set this fd to non-blocking mode,
+	 * and not bother with restoring it on exit.
+	 */
+	tty_name = xmalloc_ttyname(STDOUT_FILENO);
+	if (tty_name) {
+		tty_fd = open(tty_name, O_RDONLY);
+		free(tty_name);
+		if (tty_fd < 0)
+			goto try_ctty;
+	} else {
+		/* Try controlling tty */
+ try_ctty:
+		tty_fd = open(CURRENT_TTY, O_RDONLY);
+		if (tty_fd < 0)
+			return bb_cat(argv);
+	}
+	ndelay_on(tty_fd);
+	kbd_fd = tty_fd; /* save in a global */
 
 	tcgetattr(kbd_fd, &term_orig);
 	term_less = term_orig;
@@ -1650,7 +1672,7 @@ int less_main(int argc, char **argv)
 	term_less.c_cc[VMIN] = 1;
 	term_less.c_cc[VTIME] = 0;
 
-	IF_FEATURE_LESS_ASK_TERMINAL(G.winsize_err =) get_terminal_width_height(kbd_fd, &width, &max_displayed_line);
+	IF_FEATURE_LESS_ASK_TERMINAL(G.winsize_err =) get_terminal_width_height(kbd_fd, &width, (uint32_t*) &max_displayed_line);
 	/* 20: two tabstops + 4 */
 	if (width < 20 || max_displayed_line < 3)
 		return bb_cat(argv);
@@ -1671,7 +1693,7 @@ int less_main(int argc, char **argv)
 		while (WINCH_COUNTER) {
  again:
 			winch_counter--;
-			IF_FEATURE_LESS_ASK_TERMINAL(G.winsize_err =) get_terminal_width_height(kbd_fd, &width, &max_displayed_line);
+			IF_FEATURE_LESS_ASK_TERMINAL(G.winsize_err =) get_terminal_width_height(kbd_fd, &width, (uint32_t*) &max_displayed_line);
  IF_FEATURE_LESS_ASK_TERMINAL(got_size:)
 			/* 20: two tabstops + 4 */
 			if (width < 20)
