@@ -134,6 +134,27 @@ typedef unsigned reg_syntax_t;
    without further backtracking.  */
 #define RE_NO_POSIX_BACKTRACKING (RE_UNMATCHED_RIGHT_PAREN_ORD << 1)
 
+/* If this bit is set, do not process the GNU regex operators.
+   If not set, then the GNU regex operators are recognized. */
+#define RE_NO_GNU_OPS (RE_NO_POSIX_BACKTRACKING << 1)
+
+/* If this bit is set, turn on internal regex debugging.
+   If not set, and debugging was on, turn it off.
+   This only works if regex.c is compiled -DDEBUG.
+   We define this bit always, so that all that's needed to turn on
+   debugging is to recompile regex.c; the calling code can always have
+   this bit set, and it won't affect anything in the normal case. */
+#define RE_DEBUG (RE_NO_GNU_OPS << 1)
+
+/* If this bit is set, a syntactically invalid interval is treated as
+   a string of ordinary characters.  For example, the ERE 'a{1' is
+   treated as 'a\{1'.  */
+#define RE_INVALID_INTERVAL_ORD (RE_DEBUG << 1)
+
+/* If this bit is set, then ignore case when matching.
+   If not set, then case is significant.  */
+#define RE_ICASE (RE_INVALID_INTERVAL_ORD << 1)
+
 /* This global variable defines the particular regexp syntax to use (for
    some interfaces).  When a regexp is compiled, the syntax used is
    stored in the pattern buffer, so changing this does not affect
