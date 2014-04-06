@@ -2,7 +2,7 @@
  * Automatically generated C config: don't edit
  * Busybox version: 1.22.1
  */
-#define AUTOCONF_TIMESTAMP "2014-04-04 19:53 +0100"
+#define AUTOCONF_TIMESTAMP "2014-04-06 21:24 +0200"
 
 #define CONFIG_HAVE_DOT_CONFIG 1
 #define ENABLE_HAVE_DOT_CONFIG 1
@@ -784,14 +784,14 @@
 #define ENABLE_LZOP_COMPR_HIGH 0
 #define IF_LZOP_COMPR_HIGH(...)
 #define IF_NOT_LZOP_COMPR_HIGH(...) __VA_ARGS__
-#undef CONFIG_RPM2CPIO
-#define ENABLE_RPM2CPIO 0
-#define IF_RPM2CPIO(...)
-#define IF_NOT_RPM2CPIO(...) __VA_ARGS__
 #undef CONFIG_RPM
 #define ENABLE_RPM 0
 #define IF_RPM(...)
 #define IF_NOT_RPM(...) __VA_ARGS__
+#undef CONFIG_RPM2CPIO
+#define ENABLE_RPM2CPIO 0
+#define IF_RPM2CPIO(...)
+#define IF_NOT_RPM2CPIO(...) __VA_ARGS__
 #define CONFIG_TAR 1
 #define ENABLE_TAR 1
 #ifdef MAKE_SUID
