@@ -156,7 +156,7 @@
 #include "libbb.h"
 /* Should be after libbb.h: on some systems regex.h needs sys/types.h: */
 #if ENABLE_FEATURE_VI_REGEX_SEARCH
-# include <regex.h>
+# include "xregex.h"
 #endif
 
 /* the CRASHME code is unmaintained, and doesn't currently build */
