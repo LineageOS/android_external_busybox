@@ -14,9 +14,13 @@ void FAST_FUNC data_extract_all(archive_handle_t *archive_handle)
 
 #if ENABLE_FEATURE_TAR_SELINUX
 	char *sctx = archive_handle->tar__sctx[PAX_NEXT_FILE];
+#ifdef __BIONIC__
+	matchpathcon_init(NULL);
+#endif
 	if (!sctx)
 		sctx = archive_handle->tar__sctx[PAX_GLOBAL];
 	if (sctx) { /* setfscreatecon is 4 syscalls, avoid if possible */
+		bb_info_msg(" setfscreatecon(%s)", sctx);
 		setfscreatecon(sctx);
 		free(archive_handle->tar__sctx[PAX_NEXT_FILE]);
 		archive_handle->tar__sctx[PAX_NEXT_FILE] = NULL;
