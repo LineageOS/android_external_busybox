@@ -556,7 +556,11 @@ int setfiles_main(int argc UNUSED_PARAM, char **argv)
 		abort_on_error = 1;
 		add_assoc = 1;
 		/* follow_mounts = 0; - already is */
+#ifndef __BIONIC__
 		matchpathcon_flags = MATCHPATHCON_VALIDATE | MATCHPATHCON_NOTRANS;
+#else
+		matchpathcon_flags = MATCHPATHCON_VALIDATE;
+#endif
 	} else {
 		/*
 		 * restorecon:
@@ -569,7 +573,9 @@ int setfiles_main(int argc UNUSED_PARAM, char **argv)
 		 */
 		expand_realpath = 1;
 		follow_mounts = 1;
+#ifndef __BIONIC__
 		matchpathcon_flags = MATCHPATHCON_NOTRANS;
+#endif
 		/* restorecon only */
 		selinux_or_die();
 	}
