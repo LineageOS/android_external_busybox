@@ -94,8 +94,13 @@
 #if ENABLE_SELINUX
 # include <selinux/selinux.h>
 # include <selinux/context.h>
+#ifdef __BIONIC__
+# include "android/selinux/android_selinux.h"
+# include <sepol/policydb/flask.h>
+#else
 # include <selinux/flask.h>
 # include <selinux/av_permissions.h>
+#endif
 #endif
 #if ENABLE_FEATURE_UTMP
 # include <utmp.h>
