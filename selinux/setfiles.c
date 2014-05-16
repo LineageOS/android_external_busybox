@@ -569,7 +569,9 @@ int setfiles_main(int argc UNUSED_PARAM, char **argv)
 		 */
 		expand_realpath = 1;
 		follow_mounts = 1;
+#ifndef __BIONIC__
 		matchpathcon_flags = MATCHPATHCON_NOTRANS;
+#endif
 		/* restorecon only */
 		selinux_or_die();
 	}

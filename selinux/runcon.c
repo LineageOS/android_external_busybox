@@ -51,7 +51,9 @@
 //usage:	)
 
 #include <selinux/context.h>
+#ifndef ANDROID
 #include <selinux/flask.h>
+#endif
 
 #include "libbb.h"
 
