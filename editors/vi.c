@@ -156,7 +156,7 @@
 #include "libbb.h"
 /* Should be after libbb.h: on some systems regex.h needs sys/types.h: */
 #if ENABLE_FEATURE_VI_REGEX_SEARCH
-# include <regex.h>
+# include <bb_regex.h>
 #endif
 
 /* the CRASHME code is unmaintained, and doesn't currently build */
@@ -1720,7 +1720,7 @@ static char *char_search(char *p, const char *pat, int dir, int range)
 		re_syntax_options = RE_SYNTAX_POSIX_EXTENDED | RE_ICASE;
 
 	memset(&preg, 0, sizeof(preg));
-	err = re_compile_pattern(pat, strlen(pat), &preg);
+	err = bb_re_compile_pattern(pat, strlen(pat), &preg);
 	if (err != NULL) {
 		status_line_bold("bad search pattern '%s': %s", pat, err);
 		return p;
@@ -1748,8 +1748,8 @@ static char *char_search(char *p, const char *pat, int dir, int range)
 	// re_search() >= 0: index of found pattern
 	//           struct pattern   char     int   int    int    struct reg
 	// re_search(*pattern_buffer, *string, size, start, range, *regs)
-	i = re_search(&preg, q, size, /*start:*/ 0, range, /*struct re_registers*:*/ NULL);
-	regfree(&preg);
+	i = bb_re_search(&preg, q, size, /*start:*/ 0, range, /*struct re_registers*:*/ NULL);
+	bb_regfree(&preg);
 	if (i < 0)
 		return NULL;
 	if (dir == FORWARD)
