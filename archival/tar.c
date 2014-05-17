@@ -210,6 +210,7 @@ enum {
 	CONTTYPE = '7',		/* reserved */
 	GNULONGLINK = 'K',	/* GNU long (>100 chars) link name */
 	GNULONGNAME = 'L',	/* GNU long (>100 chars) file name */
+	EXTTYPE = 'x',		/* ext metadata for next file, store selinux_context */
 };
 
 /* Might be faster (and bigger) if the dev/ino were stored in numeric order;) */
@@ -351,6 +352,35 @@ static void writeLongname(int fd, int type, const char *name, int dir)
 }
 #endif
 
+#if ENABLE_FEATURE_TAR_SELINUX
+# define SELINUX_CONTEXT_KEYWORD "RHT.security.selinux"
+/* Write 2 blocks : extended file header + selinux context */
+static void writeSeHeader(int fd, const char *con,
+			struct tar_header_t *header)
+{
+	struct tar_header_t hd;
+	char block[TAR_BLOCK_SIZE];
+	int sz = sizeof(SELINUX_CONTEXT_KEYWORD) + strlen(con) + 4;
+	if (sz >= 100) sz++; /* another ascii digit for size */
+
+	memset(&block, 0, TAR_BLOCK_SIZE);
+	sprintf(block, "%d %s=%s\n", sz, SELINUX_CONTEXT_KEYWORD, con);
+
+	memcpy(&hd, header, sizeof(hd));
+
+	/* write duplicated file entry */
+	header->typeflag = EXTTYPE;
+	PUT_OCTAL(header->size, sz);
+	chksum_and_xwrite(fd, header);
+
+	/* write selinux context */
+	xwrite(fd, &block, TAR_BLOCK_SIZE);
+
+	/* restore main header for standard write */
+	memcpy(header, &hd, sizeof(hd));
+}
+#endif
+
 /* Write out a tar header for the specified file/directory/whatever */
 static int writeTarHeader(struct TarBallInfo *tbInfo,
 		const char *header_name, const char *fileName, struct stat *statbuf)
@@ -465,6 +495,18 @@ static int writeTarHeader(struct TarBallInfo *tbInfo,
 	if (header.name[sizeof(header.name)-1])
 		writeLongname(tbInfo->tarFd, GNULONGNAME,
 				header_name, S_ISDIR(statbuf->st_mode));
+#endif
+
+#if ENABLE_FEATURE_TAR_SELINUX
+	if (is_selinux_enabled()) {
+		security_context_t sid;
+		getfilecon(fileName, &sid);
+		if (sid) {
+			// optional extended block
+			writeSeHeader(tbInfo->tarFd, sid, &header);
+			freecon(sid);
+		}
+	}
 #endif
 
 	/* Now write the header out to disk */
