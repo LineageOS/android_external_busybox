@@ -1322,7 +1322,7 @@ static int get_next_history(void)
 /* Lists command history. Used by shell 'history' builtins */
 void FAST_FUNC show_history(const line_input_t *st)
 {
-	int i;
+	unsigned i;
 
 	if (!st)
 		return;

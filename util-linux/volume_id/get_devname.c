@@ -246,10 +246,10 @@ void display_uuid_cache(int scan_devices)
 
 int add_to_uuid_cache(const char *device)
 {
-	char *uuid = uuid; /* for compiler */
-	char *label = label;
+	static char *uuid; /* for compiler */
+	static char *label;
 #if ENABLE_FEATURE_BLKID_TYPE
-	const char *type = type;
+	static const char *type;
 #endif
 	int fd;
 
