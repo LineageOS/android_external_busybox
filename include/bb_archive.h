@@ -146,7 +146,7 @@ typedef struct tar_header_t {     /* byte offset */
 	/* Normally it's defined as magic[6] followed by
 	 * version[2], but we put them together to save code.
 	 */
-	char magic[8];            /* 257-264 */
+	char magic[8];            /* 257-264 (magic 6 + version 2) */
 	char uname[32];           /* 265-296 */
 	char gname[32];           /* 297-328 */
 	char devmajor[8];         /* 329-336 */
