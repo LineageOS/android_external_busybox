@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da0c15f0_b1496bd3",
+        "filename": "android/selinux/matchpathcon.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 4704
+      },
+      "writtenOn": "2014-05-18T06:46:37Z",
+      "side": 1,
+      "message": "android restorecon need:\nmatchpathcon_init_prefix(\"/file_contexts\", NULL)",
+      "revId": "786935308f356a0ce2f304a33a6fc99013807352",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
