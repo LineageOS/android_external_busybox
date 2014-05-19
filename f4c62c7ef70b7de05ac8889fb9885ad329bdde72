@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "da0c15f0_4cf5d281",
+        "filename": "archival/tar.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2014-05-19T03:14:23Z",
+      "side": 1,
+      "message": "i will put hd after block, to prevent overflow if context is more than 512 bytes.. http://copilotco.com/mail-archives/selinux.2002/msg01827.html ... almost improbable but ;)",
+      "revId": "f4c62c7ef70b7de05ac8889fb9885ad329bdde72",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da0c15f0_2ce7bee5",
         "filename": "archival/tar.c",
         "patchSetId": 4
@@ -13,6 +30,24 @@
       "writtenOn": "2014-05-19T03:04:17Z",
       "side": 1,
       "message": "Recommend use lgetfilecon, affect symlinks instead of their targets.",
+      "revId": "f4c62c7ef70b7de05ac8889fb9885ad329bdde72",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da0c15f0_0c03da74",
+        "filename": "archival/tar.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2014-05-19T03:14:23Z",
+      "side": 1,
+      "message": "oh, right, could be better...",
+      "parentUuid": "da0c15f0_2ce7bee5",
       "revId": "f4c62c7ef70b7de05ac8889fb9885ad329bdde72",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
