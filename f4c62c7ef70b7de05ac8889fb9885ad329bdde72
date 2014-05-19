@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da0c15f0_2ce7bee5",
+        "filename": "archival/tar.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 4704
+      },
+      "writtenOn": "2014-05-19T03:04:17Z",
+      "side": 1,
+      "message": "Recommend use lgetfilecon, affect symlinks instead of their targets.",
+      "revId": "f4c62c7ef70b7de05ac8889fb9885ad329bdde72",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
