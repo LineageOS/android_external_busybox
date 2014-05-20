@@ -45,6 +45,12 @@
 #include "libbb.h"
 #include "bb_archive.h"
 
+#if defined(ANDROID) || defined(__ANDROID__)
+/* Needed to ensure we can extract signed Android OTA packages */
+#undef ENABLE_DESKTOP
+#define ENABLE_DESKTOP 1
+#endif
+
 enum {
 #if BB_BIG_ENDIAN
 	ZIP_FILEHEADER_MAGIC = 0x504b0304,
