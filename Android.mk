@@ -123,6 +123,7 @@ BUSYBOX_CFLAGS = \
 	-DNDEBUG \
 	-DANDROID \
 	-fno-strict-aliasing \
+	-fno-builtin-stpcpy \
 	-include include-$(BUSYBOX_CONFIG)/autoconf.h \
 	-D'CONFIG_DEFAULT_MODULES_DIR="$(KERNEL_MODULES_DIR)"' \
 	-D'BB_VER="$(strip $(shell $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
