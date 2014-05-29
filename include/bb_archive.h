@@ -125,6 +125,9 @@ typedef struct archive_handle_t {
 #if ENABLE_RPM
 #define ARCHIVE_REPLACE_VIA_RENAME  (1 << 10)
 #endif
+#if ENABLE_FEATURE_TAR_SELINUX
+#define ARCHIVE_STORE_SELINUX		(1 << 15)
+#endif
 
 
 /* POSIX tar Header Block, from POSIX 1003.1-1990  */
