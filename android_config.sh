@@ -7,6 +7,7 @@ make mrproper
 cp .config-minimal .config
 echo >> .config
 echo 'CONFIG_CROSS_COMPILER_PREFIX="arm-eabi-"' >> .config
+#echo 'CONFIG_CROSS_COMPILER_PREFIX="i686-linux-android-"' >> .config
 make prepare
 cd include-minimal && ./copy-current.sh
 cd ..
@@ -14,6 +15,7 @@ cd ..
 cp .config-full .config
 echo >> .config
 echo 'CONFIG_CROSS_COMPILER_PREFIX="arm-eabi-"' >> .config
+#echo 'CONFIG_CROSS_COMPILER_PREFIX="i686-linux-android-"' >> .config
 make prepare
 cd include-full && ./copy-current.sh
 cd ..
