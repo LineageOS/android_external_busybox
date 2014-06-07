@@ -16,6 +16,41 @@
       "revId": "c1a6bc32a8367cb7e98cb65ff4173b9692384fe2",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da0c15f0_0f745533",
+        "filename": "Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2014-06-07T02:13:09Z",
+      "side": 1,
+      "message": "its for x86, i have seen also all the warnings without that (but i will check again this evening, ive only tested the whole commit)",
+      "parentUuid": "da0c15f0_cfe41d0f",
+      "revId": "c1a6bc32a8367cb7e98cb65ff4173b9692384fe2",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da0c15f0_8f87c50e",
+        "filename": "include/platform.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2014-06-07T02:13:09Z",
+      "side": 1,
+      "message": "HAVE_STPCPY",
+      "revId": "c1a6bc32a8367cb7e98cb65ff4173b9692384fe2",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
