@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba0121b8_a9f2a298",
+        "filename": "coreutils/stat.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2014-06-21T04:41:42Z",
+      "side": 1,
+      "message": "maybe it should be %s (or %ls) for wchar_t[], but not sure wchar is required, selinux context seems to be char*",
+      "revId": "2b71de8ae92990620ed187fb3b7ac4e15bd37255",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
