@@ -22,6 +22,7 @@
 /bin/chmod
 /bin/chown
 /sbin/chroot
+/bin/chvt
 /bin/clear
 /bin/cmp
 /bin/comm
@@ -33,6 +34,7 @@
 /bin/date
 /bin/dc
 /bin/dd
+/bin/deallocvt
 /sbin/depmod
 /sbin/devmem
 /bin/df
@@ -51,8 +53,10 @@
 /bin/false
 /sbin/fbsplash
 /sbin/fdisk
+/bin/fgconsole
 /bin/fgrep
 /bin/find
+/bin/findfs
 /sbin/flash_lock
 /sbin/flash_unlock
 /sbin/flashcp
@@ -75,6 +79,7 @@
 /sbin/halt
 /bin/head
 /bin/hexdump
+/sbin/hwclock
 /bin/id
 /sbin/ifconfig
 /sbin/inetd
@@ -92,6 +97,7 @@
 /bin/ls
 /bin/lsattr
 /sbin/lsmod
+/bin/lspci
 /bin/lsusb
 /bin/lzcat
 /bin/lzma
@@ -122,10 +128,12 @@
 /bin/nc
 /bin/netstat
 /bin/nice
+/bin/nmeter
 /bin/nohup
 /bin/nslookup
 /sbin/ntpd
 /bin/od
+/bin/openvt
 /bin/patch
 /bin/pgrep
 /bin/pidof
@@ -140,6 +148,7 @@
 /bin/pstree
 /bin/pwd
 /bin/pwdx
+/bin/rdate
 /sbin/rdev
 /bin/readlink
 /bin/realpath
@@ -162,6 +171,7 @@
 /sbin/setconsole
 /sbin/setenforce
 /sbin/setfiles
+/bin/setkeycodes
 /sbin/setsebool
 /bin/setserial
 /bin/setsid
@@ -171,6 +181,7 @@
 /bin/sha3sum
 /bin/sha512sum
 /bin/sleep
+/bin/smemcap
 /bin/sort
 /bin/split
 /bin/stat

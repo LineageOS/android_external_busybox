@@ -45,6 +45,12 @@ int    getsid(pid_t);
 #define SYS_ioprio_get __NR_ioprio_get
 #endif
 
+/* XXX These need to be obtained from kernel headers. See b/9336527 */
+#define SWAP_FLAG_PREFER        0x8000
+#define SWAP_FLAG_PRIO_MASK     0x7fff
+#define SWAP_FLAG_PRIO_SHIFT    0
+#define SWAP_FLAG_DISCARD       0x10000
+
 /* local definition in libbb/xfuncs_printf.c */
 int fdprintf(int fd, const char *format, ...);
 
