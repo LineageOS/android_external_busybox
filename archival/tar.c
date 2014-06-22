@@ -162,7 +162,7 @@
 
 #if !ENABLE_FEATURE_SEAMLESS_GZ && !ENABLE_FEATURE_SEAMLESS_BZ2
 /* Do not pass gzip flag to writeTarFile() */
-#define writeTarFile(tar_fd, verboseFlag, recurseFlags, optFlags, include, exclude, gzip) \
+#define writeTarFile(tar_fd, verboseFlag, optFlags, recurseFlags, include, exclude, gzip) \
 	writeTarFile(tar_fd, verboseFlag, optFlags, recurseFlags, include, exclude)
 #endif
 
