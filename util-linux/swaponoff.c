@@ -96,7 +96,7 @@ static int do_em_all(void)
 			 || hasmntopt(m, MNTOPT_NOAUTO) == NULL
 			) {
 #if ENABLE_FEATURE_SWAPON_PRI
-				char *p;
+				const char *p;
 				g_flags = 0; /* each swap space might have different flags */
 				p = hasmntopt(m, "pri");
 				if (p) {
