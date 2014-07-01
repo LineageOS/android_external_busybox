@@ -2,7 +2,7 @@
  * Automatically generated C config: don't edit
  * Busybox version: 1.22.1
  */
-#define AUTOCONF_TIMESTAMP "2014-06-22 23:11 +0200"
+#define AUTOCONF_TIMESTAMP "2014-07-01 12:17 +0200"
 
 #define CONFIG_HAVE_DOT_CONFIG 1
 #define ENABLE_HAVE_DOT_CONFIG 1
@@ -788,10 +788,14 @@
 # define IF_LZOP(...) __VA_ARGS__
 #endif
 #define IF_NOT_LZOP(...)
-#undef CONFIG_LZOP_COMPR_HIGH
-#define ENABLE_LZOP_COMPR_HIGH 0
-#define IF_LZOP_COMPR_HIGH(...)
-#define IF_NOT_LZOP_COMPR_HIGH(...) __VA_ARGS__
+#define CONFIG_LZOP_COMPR_HIGH 1
+#define ENABLE_LZOP_COMPR_HIGH 1
+#ifdef MAKE_SUID
+# define IF_LZOP_COMPR_HIGH(...) __VA_ARGS__ "CONFIG_LZOP_COMPR_HIGH"
+#else
+# define IF_LZOP_COMPR_HIGH(...) __VA_ARGS__
+#endif
+#define IF_NOT_LZOP_COMPR_HIGH(...)
 #undef CONFIG_RPM
 #define ENABLE_RPM 0
 #define IF_RPM(...)

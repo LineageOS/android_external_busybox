@@ -128,7 +128,7 @@ static const char bbconfig_config[] ALIGN1 =
 "CONFIG_FEATURE_GZIP_LONG_OPTIONS=y\n"
 "CONFIG_GZIP_FAST=2\n"
 "CONFIG_LZOP=y\n"
-"# CONFIG_LZOP_COMPR_HIGH is not set\n"
+"CONFIG_LZOP_COMPR_HIGH=y\n"
 "# CONFIG_RPM is not set\n"
 "# CONFIG_RPM2CPIO is not set\n"
 "CONFIG_TAR=y\n"

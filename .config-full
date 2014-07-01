@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Busybox version: 1.22.1
-# Sun Jun 22 23:11:10 2014
+# Tue Jul  1 12:11:32 2014
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -153,7 +153,7 @@ CONFIG_GZIP=y
 CONFIG_FEATURE_GZIP_LONG_OPTIONS=y
 CONFIG_GZIP_FAST=2
 CONFIG_LZOP=y
-# CONFIG_LZOP_COMPR_HIGH is not set
+CONFIG_LZOP_COMPR_HIGH=y
 # CONFIG_RPM is not set
 # CONFIG_RPM2CPIO is not set
 CONFIG_TAR=y
