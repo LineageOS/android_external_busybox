@@ -1,9 +1,9 @@
 LOCAL_PATH := $(call my-dir)
 BB_PATH := $(LOCAL_PATH)
 
-# Bionic Branches Switches (CM7/AOSP/ICS)
+# Bionic Branches Switches (GB/ICS/L)
 BIONIC_ICS := true
-
+BIONIC_L := false
 
 # Make a static library for regex.
 include $(CLEAR_VARS)
@@ -19,6 +19,9 @@ LOCAL_SRC_FILES := $(shell cat $(BB_PATH)/android/librpc.sources)
 LOCAL_C_INCLUDES := $(BB_PATH)/android/librpc
 LOCAL_MODULE := libuclibcrpc
 LOCAL_CFLAGS += -fno-strict-aliasing
+ifeq ($(BIONIC_L),true)
+LOCAL_CFLAGS += -DBIONIC_L
+endif
 include $(BUILD_STATIC_LIBRARY)
 
 
@@ -111,6 +114,7 @@ BUSYBOX_C_INCLUDES = \
 	$(BB_PATH)/include $(BB_PATH)/libbb \
 	bionic/libc/private \
 	bionic/libm/include \
+	bionic/libc \
 	bionic/libm \
 	libc/kernel/common \
 	external/libselinux/include \
@@ -128,9 +132,13 @@ BUSYBOX_CFLAGS = \
 	-D'CONFIG_DEFAULT_MODULES_DIR="$(KERNEL_MODULES_DIR)"' \
 	-D'BB_VER="$(strip $(shell $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
 
-# to handle differences in ICS (ipv6)
+# to handle differences in ICS/JB (ipv6)
 ifeq ($(BIONIC_ICS),true)
 BUSYBOX_CFLAGS += -DBIONIC_ICS
+endif
+
+ifeq ($(BIONIC_L),true)
+BUSYBOX_CFLAGS += -DBIONIC_L
 endif
 
 
