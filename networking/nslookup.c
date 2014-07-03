@@ -33,11 +33,25 @@
 # ifdef ENABLE_FEATURE_IPV6
 #  include <netinet/in6.h>
 # endif
-# include <arpa_nameser.h>
-# include <resolv_private.h>
-# include <resolv.h>
-# undef _res
-# define _res (*__res_get_state())
+# ifdef BIONIC_L
+#  define ANDROID_CHANGES
+#  include <arpa/nameser.h>
+#  include <resolv_private.h>
+#  include <../resolv/res_private.h>
+# else
+#  include <arpa_nameser.h>
+#  include <resolv_private.h>
+#  undef _res /* now hidden in libc */
+#  define _res (*__res_get_state())
+# endif
+#endif
+
+#ifdef BIONIC_L
+static struct __res_state res_st = {0};
+struct __res_state * __res_state(void)
+{
+	return &res_st;
+}
 #endif
 
 /*
@@ -129,7 +143,7 @@ static int print_host(const char *hostname, const char *header)
 static void server_print(void)
 {
 	char *server;
-	struct sockaddr *sa=NULL;
+	struct sockaddr *sa;
 
 #if ENABLE_FEATURE_IPV6 && !defined(__BIONIC__)
 	sa = (struct sockaddr*)_res._u._ext.nsaddrs[0];
@@ -161,7 +175,10 @@ static void set_default_dns(const char *server)
 		/* struct copy */
 		_res.nsaddr_list[0] = lsa->u.sin;
 	}
-#if ENABLE_FEATURE_IPV6 && !defined(__BIONIC__)
+#if ENABLE_FEATURE_IPV6 && (!defined(__BIONIC__) || defined(BIONIC_L))
+
+	#define EXT(res) ((res)->_u._ext)
+
 	/* Hoped libc can cope with IPv4 address there too.
 	 * No such luck, glibc 2.4 segfaults even with IPv6,
 	 * maybe I misunderstand how to make glibc use IPv6 addr?
@@ -170,10 +187,18 @@ static void set_default_dns(const char *server)
 		// glibc neither SEGVs nor sends any dgrams with this
 		// (strace shows no socket ops):
 		//_res.nscount = 0;
-		_res._u._ext.nscount = 1;
+	#ifdef __BIONIC__
+		if (EXT(&_res).ext != NULL) {
+			_res._u._ext.nscount = 1;
+			memcpy(&EXT(&_res).ext->nsaddrs[0].sin6, &lsa->u.sin6,
+				sizeof(struct sockaddr_in6));
+		}
+	#else
 		/* store a pointer to part of malloc'ed lsa */
+		_res._u._ext.nscount = 1;
 		_res._u._ext.nsaddrs[0] = &lsa->u.sin6;
 		/* must not free(lsa)! */
+	#endif
 	}
 #endif
 }
@@ -192,6 +217,20 @@ int nslookup_main(int argc, char **argv)
 	/* initialize DNS structure _res used in printing the default
 	 * name server and in the explicit name server option feature. */
 	res_init();
+
+#ifdef BIONIC_L
+	res_ninit(&_res);
+# if DEBUG
+	/* ok, we have same _res.options and nameserver on kit kat */
+	printf("%d name server found. options=%x\n", _res.nscount, _res.options);
+	if (_res.nscount) {
+		char str[INET6_ADDRSTRLEN];
+		inet_ntop(AF_INET, &_res.nsaddr, str, INET_ADDRSTRLEN);
+		printf("  %s\n", str);
+	}
+# endif
+#endif
+
 	/* rfc2133 says this enables IPv6 lookups */
 	/* (but it also says "may be enabled in /etc/resolv.conf") */
 	/*_res.options |= RES_USE_INET6;*/

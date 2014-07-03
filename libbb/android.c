@@ -70,7 +70,7 @@ struct mntent *getmntent(FILE *fp)
 }
 
 /* not used anyway */
-int addmntent(FILE *fp, const struct mntent *mnt)
+int addmntent(FILE *fp UNUSED_PARAM, const struct mntent *mnt UNUSED_PARAM)
 {
 	errno = ENOENT;
 	return 1;
