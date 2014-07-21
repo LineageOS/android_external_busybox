@@ -2,12 +2,9 @@
 # this step is no more required to build busybox, it is made automatically
 # in Android.mk (busybox_prepare module)
 
-cat ../.config | grep -v CONFIG_CROSS_COMPILER_PREFIX > ../.config-minimal
+[ -z "$OUT" ] && exit 1
 
-cp ../include/applets.h ./
-cp ../include/applet_tables.h ./
-cp ../include/autoconf.h ./
-cp ../include/bbconfigopts_bz2.h ./
-cp ../include/bbconfigopts.h ./
-cp ../include/NUM_APPLETS.h ./
-cp ../include/usage_compressed.h ./
+bb_obj=$OUT/obj/busybox/minimal
+
+cat $bb_obj/.config | grep -v CONFIG_CROSS_COMPILER_PREFIX > ../.config-minimal
+
