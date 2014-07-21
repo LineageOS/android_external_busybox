@@ -6,20 +6,18 @@ Note about this Android Variant :
 
 WARNING : THIS IS A BIONIC VERSION OF BUSYBOX, DO NOT USE "make" IN THIS TREE
 
-This tree has multiple configurations,
+This tree has multiple configurations (busybox and recovery lib),
 
-- select the wanted config profile (full or minimal) :
-  cp .config-full .config
+- lunch your device to prepare the environment
+- edit the wanted config profile (.config-full or .config-minimal)
 
-- type "make menuconfig" to update .config
-- type "make prepare" to generate include/ files
-- copy the generated files in include-full/ or include-minimal/
+- type "mma" in external/busybox to build with the dependencies
 
-  (there is a script to copy files inside these directories)
+ Finally copy $OUT/obj/busybox/full/.config to .config-full without
+ the CONFIG_CROSS_COMPILER_PREFIX line ! to stay compatible with x86 targets
 
- finally copy .config to .config-full or .config-minimal
-
- please also check busybox-profile.links and busybox-profile.sources
+ If you add or remove some applets,
+ please also update busybox-profile.links and busybox-profile.sources
 
 ----------------
 
