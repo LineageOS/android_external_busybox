@@ -50,6 +50,8 @@ $(call add-clean-step, rm -rf $(PRODUCT_OUT)/obj/STATIC_LIBRARIES/libbusybox_int
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/obj/UTILITY_EXECUTABLES/static_busybox_intermediates)
 
 $(call add-clean-step, rm -f external/busybox/.config)
+$(call add-clean-step, rm -f external/busybox/include/applet_tables.h)
+$(call add-clean-step, rm -f external/busybox/include/applets.h)
 $(call add-clean-step, cd external/busybox && git clean -f -- include*)
 
 # ************************************************
