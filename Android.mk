@@ -57,8 +57,10 @@ $(LOCAL_MODULE):
 	@mkdir -p $(bb_gen)/full/include
 	cat $(BB_PATH)/.config-full > $(bb_gen)/full/.config
 	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/full/.config
-	cd $(BB_PATH) && make prepare O=$(ANDROID_BUILD_TOP)/$(bb_gen)/full
+	cd $(BB_PATH) && make prepare O=$(bb_gen)/full
 	cd $(ANDROID_BUILD_TOP)
+
+# note: aosp may require O=$(ANDROID_BUILD_TOP)/$(bb_gen)/...
 
 include $(BUILD_PREBUILT)
 
@@ -76,7 +78,7 @@ $(LOCAL_MODULE):
 	@mkdir -p $(bb_gen)/minimal/include
 	cat $(BB_PATH)/.config-minimal > $(bb_gen)/minimal/.config
 	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/minimal/.config
-	cd $(BB_PATH) && make prepare O=$(ANDROID_BUILD_TOP)/$(bb_gen)/minimal
+	cd $(BB_PATH) && make prepare O=$(bb_gen)/minimal
 	cd $(ANDROID_BUILD_TOP)
 
 include $(BUILD_PREBUILT)
