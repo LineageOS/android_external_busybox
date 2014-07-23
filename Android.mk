@@ -61,7 +61,7 @@ LOCAL_SRC_FILES := .config-full
 $(LOCAL_MODULE):
 	@echo -e ${CL_GRN}"Prepare config for busybox binary"${CL_RST}
 	@cd $(ANDROID_BUILD_TOP)
-	@rm -rf $(bb_gen)/full
+	@#rm -rf $(bb_gen)/full
 	@mkdir -p $(bb_gen)/full/include
 	cat $(BB_PATH)/.config-full > $(bb_gen)/full/.config
 	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/full/.config
@@ -80,7 +80,7 @@ LOCAL_SRC_FILES := .config-minimal
 $(LOCAL_MODULE):
 	@echo -e ${CL_GRN}"Prepare config for libbusybox"${CL_RST}
 	@cd $(ANDROID_BUILD_TOP)
-	@rm -rf $(bb_gen)/minimal
+	@#rm -rf $(bb_gen)/minimal
 	@mkdir -p $(bb_gen)/minimal/include
 	cat $(BB_PATH)/.config-minimal > $(bb_gen)/minimal/.config
 	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/minimal/.config
@@ -182,7 +182,7 @@ LOCAL_CFLAGS += \
 LOCAL_MODULE := libbusybox
 LOCAL_MODULE_TAGS := eng debug
 LOCAL_STATIC_LIBRARIES := libcutils libc libm libselinux
-LOCAL_ADDITIONAL_DEPENDENCIES := busybox_prepare_minimal
+LOCAL_REQUIRED_MODULES := busybox_prepare_minimal
 include $(BUILD_STATIC_LIBRARY)
 
 
@@ -205,7 +205,7 @@ LOCAL_MODULE_TAGS := eng debug
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
 LOCAL_SHARED_LIBRARIES := libc libcutils libm
 LOCAL_STATIC_LIBRARIES := libclearsilverregex libuclibcrpc libselinux
-LOCAL_ADDITIONAL_DEPENDENCIES := busybox_prepare_full
+LOCAL_REQUIRED_MODULES := busybox_prepare_full
 include $(BUILD_EXECUTABLE)
 
 BUSYBOX_LINKS := $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).links)
@@ -254,5 +254,5 @@ LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc l
 LOCAL_MODULE_CLASS := UTILITY_EXECUTABLES
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
-LOCAL_ADDITIONAL_DEPENDENCIES := busybox_prepare_full
+LOCAL_REQUIRED_MODULES := busybox_prepare_full
 include $(BUILD_EXECUTABLE)
