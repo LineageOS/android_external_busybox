@@ -96,7 +96,7 @@
 # include <selinux/context.h>
 #ifdef __BIONIC__
 # include "android/selinux/android_selinux.h"
-# include <sepol/policydb/flask.h>
+# define SECCLASS_PROCESS 2
 #else
 # include <selinux/flask.h>
 # include <selinux/av_permissions.h>
