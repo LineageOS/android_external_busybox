@@ -5,6 +5,8 @@
 #include <selinux/label.h>
 #include <selinux/android.h>
 
+#define SECCLASS_PROCESS 2
+
 /* Set the function used by matchpathcon_init when displaying
    errors about the file_contexts configuration.  If not set,
    then this defaults to fprintf(stderr, fmt, ...). */
