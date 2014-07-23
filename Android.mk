@@ -42,6 +42,12 @@ ifeq ($(TARGET_ARCH),mips)
     BUSYBOX_CROSS_COMPILER_PREFIX := mipsel-linux-android-
 endif
 
+BB_PREPARE_FLAGS:=
+ifeq ($(HOST_OS),darwin)
+    BB_HOSTCC := $(ANDROID_BUILD_TOP)/prebuilts/gcc/darwin-x86/host/i686-apple-darwin-4.2.1/bin/i686-apple-darwin11-gcc
+    BB_PREPARE_FLAGS := HOSTCC=$(BB_HOSTCC)
+endif
+
 KERNEL_MODULES_DIR ?= /system/lib/modules
 
 bb_gen := $(TARGET_OUT_INTERMEDIATES)/busybox
@@ -53,14 +59,12 @@ LOCAL_MODULE_PATH := $(bb_gen)/full
 LOCAL_SRC_FILES := .config-full
 $(LOCAL_MODULE):
 	@echo -e ${CL_GRN}"Prepare config for busybox binary"${CL_RST}
+	@cd $(ANDROID_BUILD_TOP)
 	@rm -rf $(bb_gen)/full
 	@mkdir -p $(bb_gen)/full/include
 	cat $(BB_PATH)/.config-full > $(bb_gen)/full/.config
 	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/full/.config
-	cd $(BB_PATH) && make prepare O=$(bb_gen)/full
-	cd $(ANDROID_BUILD_TOP)
-
-# note: aosp may require O=$(ANDROID_BUILD_TOP)/$(bb_gen)/...
+	make -C $(BB_PATH) prepare O=$(bb_gen)/full $(BB_PREPARE_FLAGS)
 
 include $(BUILD_PREBUILT)
 
@@ -74,12 +78,12 @@ LOCAL_MODULE_PATH := $(bb_gen)/minimal
 LOCAL_SRC_FILES := .config-minimal
 $(LOCAL_MODULE):
 	@echo -e ${CL_GRN}"Prepare config for libbusybox"${CL_RST}
+	@cd $(ANDROID_BUILD_TOP)
 	@rm -rf $(bb_gen)/minimal
 	@mkdir -p $(bb_gen)/minimal/include
 	cat $(BB_PATH)/.config-minimal > $(bb_gen)/minimal/.config
 	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/minimal/.config
-	cd $(BB_PATH) && make prepare O=$(bb_gen)/minimal
-	cd $(ANDROID_BUILD_TOP)
+	make -C $(BB_PATH) prepare O=$(bb_gen)/minimal $(BB_PREPARE_FLAGS)
 
 include $(BUILD_PREBUILT)
 
