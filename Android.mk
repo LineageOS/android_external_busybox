@@ -48,8 +48,6 @@ ifeq ($(HOST_OS),darwin)
     BB_PREPARE_FLAGS := HOSTCC=$(BB_HOSTCC)
 endif
 
-KERNEL_MODULES_DIR ?= /system/lib/modules
-
 bb_gen := $(TARGET_OUT_INTERMEDIATES)/busybox
 ifeq (,$(findstring $(ANDROID_BUILD_TOP),$(TARGET_OUT_INTERMEDIATES)))
     bb_gen := $(ANDROID_BUILD_TOP)/$(TARGET_OUT_INTERMEDIATES)/busybox
@@ -183,7 +181,7 @@ LOCAL_CFLAGS += \
   -Dgenerate_uuid=busybox_generate_uuid
 LOCAL_MODULE := libbusybox
 LOCAL_MODULE_TAGS := eng debug
-LOCAL_STATIC_LIBRARIES := libcutils libc libm libselinux libsepol
+LOCAL_STATIC_LIBRARIES := libcutils libc libm libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := busybox_prepare_minimal
 include $(BUILD_STATIC_LIBRARY)
 
@@ -206,7 +204,7 @@ LOCAL_MODULE := busybox
 LOCAL_MODULE_TAGS := eng debug
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
 LOCAL_SHARED_LIBRARIES := libc libcutils libm
-LOCAL_STATIC_LIBRARIES := libclearsilverregex libuclibcrpc libselinux libsepol
+LOCAL_STATIC_LIBRARIES := libclearsilverregex libuclibcrpc libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := busybox_prepare_full
 include $(BUILD_EXECUTABLE)
 
@@ -252,7 +250,7 @@ LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE := static_busybox
 LOCAL_MODULE_STEM := busybox
 LOCAL_MODULE_TAGS := optional
-LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc libselinux libsepol
+LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc libselinux
 LOCAL_MODULE_CLASS := UTILITY_EXECUTABLES
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
