@@ -53,19 +53,29 @@ ifeq (,$(findstring $(ANDROID_BUILD_TOP),$(TARGET_OUT_INTERMEDIATES)))
     bb_gen := $(ANDROID_BUILD_TOP)/$(TARGET_OUT_INTERMEDIATES)/busybox
 endif
 
+# Check if -B is present in make flags
+BB_CLOBBER := $(shell echo $(MAKEFLAGS) | grep wB)
+ifeq (,$(BB_CLOBBER))
+    BB_CLOBBER := $(shell (test -e $(bb_gen)/minimal/.config && test -e $(bb_gen)/full/.config) || echo "B")
+endif
+
+# But, to prevent problems on changes...
+BB_CLOBBER := always
+
 LOCAL_MODULE := busybox_prepare_full
 LOCAL_MODULE_TAGS := eng debug
 LOCAL_MODULE_CLASS := ETC
 LOCAL_MODULE_PATH := $(bb_gen)/full
-LOCAL_SRC_FILES := .config-full
+LOCAL_SRC_FILES := busybox-full.config
 $(LOCAL_MODULE):
+ifneq (,$(BB_CLOBBER))
 	@echo -e ${CL_GRN}"Prepare config for busybox binary"${CL_RST}
-	@cd $(ANDROID_BUILD_TOP)
 	@rm -rf $(bb_gen)/full
 	@mkdir -p $(bb_gen)/full/include
-	cat $(BB_PATH)/.config-full > $(bb_gen)/full/.config
+	cat $(BB_PATH)/busybox-full.config > $(bb_gen)/full/.config
 	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/full/.config
 	make -C $(BB_PATH) prepare O=$(bb_gen)/full $(BB_PREPARE_FLAGS)
+endif
 
 include $(BUILD_PREBUILT)
 
@@ -76,15 +86,16 @@ LOCAL_MODULE := busybox_prepare_minimal
 LOCAL_MODULE_TAGS := eng debug
 LOCAL_MODULE_CLASS := ETC
 LOCAL_MODULE_PATH := $(bb_gen)/minimal
-LOCAL_SRC_FILES := .config-minimal
+LOCAL_SRC_FILES := busybox-minimal.config
 $(LOCAL_MODULE):
+ifneq (,$(BB_CLOBBER))
 	@echo -e ${CL_GRN}"Prepare config for libbusybox"${CL_RST}
-	@cd $(ANDROID_BUILD_TOP)
 	@rm -rf $(bb_gen)/minimal
 	@mkdir -p $(bb_gen)/minimal/include
-	cat $(BB_PATH)/.config-minimal > $(bb_gen)/minimal/.config
+	cat $(BB_PATH)/busybox-minimal.config > $(bb_gen)/minimal/.config
 	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/minimal/.config
 	make -C $(BB_PATH) prepare O=$(bb_gen)/minimal $(BB_PREPARE_FLAGS)
+endif
 
 include $(BUILD_PREBUILT)
 
