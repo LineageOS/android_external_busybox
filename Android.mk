@@ -33,7 +33,7 @@ include $(CLEAR_VARS)
 
 # Explicitly set an architecture specific CONFIG_CROSS_COMPILER_PREFIX
 ifeq ($(TARGET_ARCH),arm)
-    BUSYBOX_CROSS_COMPILER_PREFIX := arm-eabi-
+    BUSYBOX_CROSS_COMPILER_PREFIX := arm-linux-androideabi-
 endif
 ifeq ($(TARGET_ARCH),x86)
     BUSYBOX_CROSS_COMPILER_PREFIX := i686-linux-android-
@@ -53,40 +53,34 @@ ifeq (,$(findstring $(ANDROID_BUILD_TOP),$(TARGET_OUT_INTERMEDIATES)))
     bb_gen := $(ANDROID_BUILD_TOP)/$(TARGET_OUT_INTERMEDIATES)/busybox
 endif
 
-LOCAL_MODULE := busybox_prepare_full
-LOCAL_MODULE_TAGS := eng debug
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_PATH := $(bb_gen)/full
-LOCAL_SRC_FILES := .config-full
+# Check if -B is present in make flags,
+#    value is B on darwin, wB on linux
+BB_FORCE := $(filter B wB,$(MAKEFLAGS))
+
+busybox_prepare_full := $(bb_gen)/full/.config
+
+ifneq ($(BB_FORCE),)
 $(LOCAL_MODULE):
+endif
+$(busybox_prepare_full): $(BB_PATH)/busybox-full.config
 	@echo -e ${CL_GRN}"Prepare config for busybox binary"${CL_RST}
-	@cd $(ANDROID_BUILD_TOP)
 	@rm -rf $(bb_gen)/full
-	@mkdir -p $(bb_gen)/full/include
-	cat $(BB_PATH)/.config-full > $(bb_gen)/full/.config
-	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/full/.config
+	@mkdir -p $(dir $@)
+	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
 	make -C $(BB_PATH) prepare O=$(bb_gen)/full $(BB_PREPARE_FLAGS)
 
-include $(BUILD_PREBUILT)
+busybox_prepare_minimal := $(bb_gen)/minimal/.config
 
-LOCAL_PATH := $(BB_PATH)
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := busybox_prepare_minimal
-LOCAL_MODULE_TAGS := eng debug
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_PATH := $(bb_gen)/minimal
-LOCAL_SRC_FILES := .config-minimal
+ifneq ($(BB_FORCE))
 $(LOCAL_MODULE):
+endif
+$(busybox_prepare_minimal): $(BB_PATH)/busybox-minimal.config
 	@echo -e ${CL_GRN}"Prepare config for libbusybox"${CL_RST}
-	@cd $(ANDROID_BUILD_TOP)
 	@rm -rf $(bb_gen)/minimal
-	@mkdir -p $(bb_gen)/minimal/include
-	cat $(BB_PATH)/.config-minimal > $(bb_gen)/minimal/.config
-	@echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(bb_gen)/minimal/.config
+	mkdir -p $(dir $@)
+	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
 	make -C $(BB_PATH) prepare O=$(bb_gen)/minimal $(BB_PREPARE_FLAGS)
 
-include $(BUILD_PREBUILT)
 
 #####################################################################
 
@@ -182,7 +176,7 @@ LOCAL_CFLAGS += \
 LOCAL_MODULE := libbusybox
 LOCAL_MODULE_TAGS := eng debug
 LOCAL_STATIC_LIBRARIES := libcutils libc libm libselinux
-LOCAL_ADDITIONAL_DEPENDENCIES := busybox_prepare_minimal
+LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_minimal)
 include $(BUILD_STATIC_LIBRARY)
 
 
@@ -205,7 +199,7 @@ LOCAL_MODULE_TAGS := eng debug
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
 LOCAL_SHARED_LIBRARIES := libc libcutils libm
 LOCAL_STATIC_LIBRARIES := libclearsilverregex libuclibcrpc libselinux
-LOCAL_ADDITIONAL_DEPENDENCIES := busybox_prepare_full
+LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
 include $(BUILD_EXECUTABLE)
 
 BUSYBOX_LINKS := $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).links)
@@ -254,5 +248,5 @@ LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc l
 LOCAL_MODULE_CLASS := UTILITY_EXECUTABLES
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
-LOCAL_ADDITIONAL_DEPENDENCIES := busybox_prepare_full
+LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
 include $(BUILD_EXECUTABLE)
