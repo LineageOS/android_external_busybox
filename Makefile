@@ -4,6 +4,8 @@ SUBLEVEL = 1
 EXTRAVERSION =
 NAME = bionic
 
+KBUILD_OUTPUT=$(OUT)/obj/busybox
+
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
 # More info can be located in ./README
