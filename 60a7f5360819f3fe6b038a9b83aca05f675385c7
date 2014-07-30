@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a061dce_cb741eff",
+        "filename": "Android.mk",
+        "patchSetId": 11
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 7060
+      },
+      "writtenOn": "2014-07-30T18:52:25Z",
+      "side": 1,
+      "message": "What is this intended for? LOCAL_MODULE should be empty after include $(CLEAR_VARS)",
+      "revId": "60a7f5360819f3fe6b038a9b83aca05f675385c7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
