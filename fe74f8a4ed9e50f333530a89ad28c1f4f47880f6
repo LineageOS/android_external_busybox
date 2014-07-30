@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a061dce_4bedae8a",
+        "filename": "Android.mk",
+        "patchSetId": 12
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 7060
+      },
+      "writtenOn": "2014-07-30T20:18:19Z",
+      "side": 1,
+      "message": "Better to use the automatic variable $(@D)\n\nRefer http://www.gnu.org/software/make/manual/make.html#index-g_t_0024_0028_0040_0040D_0029-984",
+      "revId": "fe74f8a4ed9e50f333530a89ad28c1f4f47880f6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a061dce_8bffc633",
+        "filename": "Android.mk",
+        "patchSetId": 12
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7060
+      },
+      "writtenOn": "2014-07-30T20:18:19Z",
+      "side": 1,
+      "message": "O\u003d$(@D) ...",
+      "revId": "fe74f8a4ed9e50f333530a89ad28c1f4f47880f6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
