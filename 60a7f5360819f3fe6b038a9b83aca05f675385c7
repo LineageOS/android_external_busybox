@@ -34,6 +34,24 @@
       "revId": "60a7f5360819f3fe6b038a9b83aca05f675385c7",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a061dce_ebe5a2a8",
+        "filename": "Android.mk",
+        "patchSetId": 11
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2014-07-30T20:03:05Z",
+      "side": 1,
+      "message": "in fact the whole BB_FORCE condition seems useless, that also do the prepare config on \"mm -B\" :p\ndamn, i need to rebase all my branches again",
+      "parentUuid": "9a061dce_0bcc5634",
+      "revId": "60a7f5360819f3fe6b038a9b83aca05f675385c7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
