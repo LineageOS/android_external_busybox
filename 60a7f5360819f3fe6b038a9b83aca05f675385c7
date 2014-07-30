@@ -16,6 +16,24 @@
       "revId": "60a7f5360819f3fe6b038a9b83aca05f675385c7",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a061dce_0bcc5634",
+        "filename": "Android.mk",
+        "patchSetId": 11
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2014-07-30T19:57:37Z",
+      "side": 1,
+      "message": "damn, you are right, i made that in some other apps, but it was after the LOCAL_MODULE definition... i want to force the prepare with \"mm -B\"",
+      "parentUuid": "9a061dce_cb741eff",
+      "revId": "60a7f5360819f3fe6b038a9b83aca05f675385c7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
