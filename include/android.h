@@ -51,10 +51,10 @@ int    getsid(pid_t);
 /* local definition in libbb/xfuncs_printf.c */
 int fdprintf(int fd, const char *format, ...);
 
-/* local definitions in android/android.c */
+/* local definitions in android/libc/pty.c */
 #include <fcntl.h>
 #ifndef SPLICE_F_GIFT
-/* if this constant is not defined, we are
+/* if this constant is not defined,
    ttyname is not in bionic */
 char* bb_ttyname(int);
 int   bb_ttyname_r(int, char *, size_t);
@@ -66,6 +66,7 @@ extern char* ttyname(int);
 extern int   ttyname_r(int, char *, size_t);
 #endif
 
+/* local definitions in android/android.c */
 char *getusershell(void);
 void setusershell(void);
 void endusershell(void);

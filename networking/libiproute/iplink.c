@@ -338,7 +338,7 @@ static void vlan_parse_opt(char **argv, struct nlmsghdr *n, unsigned int size)
 	};
 	int arg;
 	uint16_t id, proto;
-	struct ifla_vlan_flags flags = {};
+	struct ifla_vlan_flags flags = { 0, 0 };
 
 	while (*argv) {
 		arg = index_in_substrings(keywords, *argv);
@@ -395,7 +395,7 @@ static void vlan_parse_opt(char **argv, struct nlmsghdr *n, unsigned int size)
 
 #ifndef NLMSG_TAIL
 #define NLMSG_TAIL(nmsg) \
-	((struct rtattr *) (((void *) (nmsg)) + NLMSG_ALIGN((nmsg)->nlmsg_len)))
+	((struct rtattr *) ((void *) ((nmsg) + NLMSG_ALIGN((nmsg)->nlmsg_len))))
 #endif
 /* Return value becomes exitcode. It's okay to not return at all */
 static int do_add_or_delete(char **argv, const unsigned rtm)
@@ -465,10 +465,10 @@ static int do_add_or_delete(char **argv, const unsigned rtm)
 			if (strcmp(type_str, "vlan") == 0)
 				vlan_parse_opt(argv, &req.n, sizeof(req));
 
-			data->rta_len = (void *)NLMSG_TAIL(&req.n) - (void *)data;
+			data->rta_len = (NLMSG_TAIL(&req.n) - (data));
 		}
 
-		linkinfo->rta_len = (void *)NLMSG_TAIL(&req.n) - (void *)linkinfo;
+		linkinfo->rta_len = (NLMSG_TAIL(&req.n) - (linkinfo));
 	}
 	if (rtm != RTM_NEWLINK) {
 		if (!dev_str)
