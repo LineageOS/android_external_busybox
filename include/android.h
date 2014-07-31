@@ -31,9 +31,6 @@ void endutent(void);
 /* defined in bionic/mktemp.c */
 char *mkdtemp(char *);
 
-/* defined in bionic/stubs.c */
-char *ttyname(int);
-
 /* SYSCALLS */
 int    stime(time_t *);
 int    swapon(const char *, int);
@@ -54,8 +51,20 @@ int    getsid(pid_t);
 /* local definition in libbb/xfuncs_printf.c */
 int fdprintf(int fd, const char *format, ...);
 
-/* local definitions in libbb/android.c */
-int ttyname_r(int, char *, size_t);
+/* local definitions in android/android.c */
+#include <fcntl.h>
+#ifndef SPLICE_F_GIFT
+/* if this constant is not defined, we are
+   ttyname is not in bionic */
+char* bb_ttyname(int);
+int   bb_ttyname_r(int, char *, size_t);
+#define ttyname(n)       bb_ttyname(n)
+#define ttyname_r(n,s,z) bb_ttyname_r(n,s,z)
+#else
+/* should be available in android M ? */
+extern char* ttyname(int);
+extern int   ttyname_r(int, char *, size_t);
+#endif
 
 char *getusershell(void);
 void setusershell(void);
@@ -65,7 +74,7 @@ struct mntent;
 struct __sFILE;
 int addmntent(struct __sFILE *, const struct mntent *);
 struct mntent *getmntent_r(struct __sFILE *fp, struct mntent *mnt, char *buf, int buflen);
-const char *hasmntopt(const struct mntent *, const char *);
+char *hasmntopt(const struct mntent *, const char *);
 
 #define MNTOPT_NOAUTO "noauto"
 
