@@ -47,7 +47,7 @@ static unsigned int part_array_len;
 static unsigned int part_entry_len;
 
 static inline gpt_partition *
-gpt_part(int i)
+gpt_part(unsigned i)
 {
 	if (i >= n_parts) {
 		return NULL;
@@ -90,7 +90,7 @@ gpt_print_wide(uint16_t *s, int max_len)
 static void
 gpt_list_table(int xtra UNUSED_PARAM)
 {
-	int i;
+	unsigned i;
 	char numstr6[6];
 
 	smart_ulltoa5(total_number_of_sectors * sector_size, numstr6, " KMGTPEZY")[0] = '\0';
@@ -175,7 +175,7 @@ check_gpt_label(void)
 	part_array_len = n_parts * part_entry_len;
 	part_array = xmalloc(part_array_len);
 	seek_sector(SWAP_LE64(gpt_hdr->first_part_lba));
-	if (full_read(dev_fd, part_array, part_array_len) != part_array_len) {
+	if (full_read(dev_fd, part_array, part_array_len) != (ssize_t) part_array_len) {
 		fdisk_fatal(unable_to_read);
 	}
 
