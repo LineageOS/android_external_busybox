@@ -74,11 +74,6 @@
 #  include <shadow.h>
 # endif
 #endif
-#if defined(ANDROID) || defined(__ANDROID__)
-//see android.h
-//# define endpwent() ((void)0)
-//# define endgrent() ((void)0)
-#endif
 #ifdef HAVE_MNTENT_H
 # include <mntent.h>
 #endif
