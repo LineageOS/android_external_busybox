@@ -2088,7 +2088,7 @@ static char *awk_printf(node *n)
 	char *b = NULL;
 	char *fmt, *s, *f;
 	const char *s1;
-	int i, j, incr, bsize;
+	int i, j, incr, bsize = 0;
 	char c, c1;
 	var *v, *arg;
 
@@ -2490,11 +2490,11 @@ static var *evaluate(node *op, var *res)
 		struct {
 			var *v;
 			const char *s;
-		} L;
+		} L = { NULL, NULL };
 		struct {
 			var *v;
 			const char *s;
-		} R;
+		} R = { NULL, NULL };
 		static double L_d;
 		uint32_t opinfo;
 		int opn;
