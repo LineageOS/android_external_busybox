@@ -666,7 +666,7 @@ static void unpack6(char *packet, int sz, struct sockaddr_in6 *from, int hoplimi
 	char buf[INET6_ADDRSTRLEN];
 
 	/* discard if too short */
-	if (sz < (datalen + sizeof(struct icmp6_hdr)))
+	if (sz < (int) (datalen + sizeof(struct icmp6_hdr)))
 		return;
 
 	icmppkt = (struct icmp6_hdr *) packet;
@@ -677,7 +677,7 @@ static void unpack6(char *packet, int sz, struct sockaddr_in6 *from, int hoplimi
 		uint16_t recv_seq = ntohs(icmppkt->icmp6_seq);
 		uint32_t *tp = NULL;
 
-		if (sz >= sizeof(struct icmp6_hdr) + sizeof(uint32_t))
+		if (sz >= (int) (sizeof(struct icmp6_hdr) + sizeof(uint32_t)))
 			tp = (uint32_t *) &icmppkt->icmp6_data8[4];
 		unpack_tail(sz, tp,
 			inet_ntop(AF_INET6, &from->sin6_addr,
