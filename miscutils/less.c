@@ -502,7 +502,7 @@ static void read_lines(void)
 		}
 		if (!(option_mask32 & FLAG_S)
 		  ? (max_fline > cur_fline + max_displayed_line)
-		  : (max_fline >= cur_fline
+		  : (max_fline >= (unsigned) cur_fline
 		     && max_lineno > LINENO(flines[cur_fline]) + max_displayed_line)
 		) {
 #if !ENABLE_FEATURE_LESS_REGEXP
@@ -926,7 +926,7 @@ static int64_t getch_nowait(void)
 //TODO: reuse code for determining this
 	if (!(option_mask32 & FLAG_S)
 	   ? !(max_fline > cur_fline + max_displayed_line)
-	   : !(max_fline >= cur_fline
+	   : !(max_fline >= (unsigned) cur_fline
 	       && max_lineno > LINENO(flines[cur_fline]) + max_displayed_line)
 	) {
 		if (eof_error > 0) /* did NOT reach eof yet */

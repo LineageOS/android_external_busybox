@@ -228,7 +228,7 @@ static uint32_t find_cdf_offset(void)
 		 * where cdf_offset points past EOF - ??
 		 * Ignore such CDEs:
 		 */
-		if (cde_header.formatted.cdf_offset < end + (p - buf))
+		if ((int64_t) cde_header.formatted.cdf_offset < end + (p - buf))
 			break;
 		cde_header.formatted.cdf_offset = BAD_CDF_OFFSET;
 	}
