@@ -25,7 +25,7 @@ procps/renice.c procps/sysctl.c procps/top.c procps/uptime.c procps/watch.c
 
 shell/ash.c shell/ash_ptr_hack.c shell/math.c shell/random.c shell/shell_common.c
 
-android/selinux/matchpathcon.c
+android/selinux/matchpathcon.c android/selinux/stubs.c
 libbb/selinux_common.c selinux/chcon.c selinux/selinuxenabled.c
 selinux/getenforce.c selinux/sestatus.c selinux/setsebool.c
 selinux/getsebool.c selinux/setenforce.c selinux/setfiles.c selinux/matchpathcon.c
