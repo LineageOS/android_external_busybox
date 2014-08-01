@@ -29,10 +29,12 @@ static void check_selinux_update_passwd(const char *username)
 	seuser = strtok(context, ":");
 	if (!seuser)
 		bb_error_msg_and_die("invalid context '%s'", context);
+#ifndef __BIONIC__
 	if (strcmp(seuser, username) != 0) {
 		if (selinux_check_passwd_access(PASSWD__PASSWD) != 0)
 			bb_error_msg_and_die("SELinux: access denied");
 	}
+#endif
 	if (ENABLE_FEATURE_CLEAN_UP)
 		freecon(context);
 }
