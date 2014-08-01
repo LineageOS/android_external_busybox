@@ -17,8 +17,10 @@
 
 #if ENABLE_SELINUX
 # include <selinux/selinux.h>  /* for is_selinux_enabled()  */
+#ifndef __BIONIC__
 # include <selinux/get_context_list.h> /* for get_default_context() */
 # include <selinux/flask.h> /* for security class definitions  */
+#endif
 #endif
 
 #if ENABLE_PAM
@@ -397,7 +399,7 @@ int login_main(int argc UNUSED_PARAM, char **argv)
 					pam_strerror(pamh, pamret), pamret);
 		safe_strncpy(username, "UNKNOWN", sizeof(username));
 #else /* not PAM */
-		pw = getpwnam(username);
+		pw = safegetpwnam(username);
 		if (!pw) {
 			strcpy(username, "UNKNOWN");
 			goto fake_it;
