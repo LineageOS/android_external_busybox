@@ -322,6 +322,12 @@ char* FAST_FUNC xasprintf(const char *format, ...)
 
 void FAST_FUNC xsetenv(const char *key, const char *value)
 {
+#ifdef __BIONIC__
+	/* on login, can be NULL, and should not be for bionic */
+	extern char** environ;
+	if (environ == NULL)
+		environ = (char **)xzalloc(sizeof(char *));
+#endif
 	if (setenv(key, value, 1))
 		bb_error_msg_and_die("%s", bb_msg_memory_exhausted);
 }

@@ -38,6 +38,14 @@ static void edit_file(const struct passwd *pas, const char *file)
 		return;
 	}
 
+/* TODO: test the applet
+#ifdef __BIONIC__
+	if (pas && !pas->pw_shell) {
+		pas->pw_shell = "/system/bin/sh";
+	}
+#endif
+*/
+
 	/* CHILD - change user and run editor */
 	/* initgroups, setgid, setuid */
 	change_identity(pas);
