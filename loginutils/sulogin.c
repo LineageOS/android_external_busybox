@@ -45,7 +45,7 @@ int sulogin_main(int argc UNUSED_PARAM, char **argv)
 	/* Clear dangerous stuff, set PATH */
 	sanitize_env_if_suid();
 
-	pwd = getpwuid(0);
+	pwd = safegetpwuid(0);
 	if (!pwd) {
 		goto auth_error;
 	}
