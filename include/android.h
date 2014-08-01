@@ -51,7 +51,7 @@ int    getsid(pid_t);
 /* local definition in libbb/xfuncs_printf.c */
 int fdprintf(int fd, const char *format, ...);
 
-/* local definitions in android/android.c */
+/* local definitions in android/libc/pty.c */
 #include <fcntl.h>
 #ifndef SPLICE_F_GIFT
 /* if this constant is not defined, we are
@@ -66,6 +66,7 @@ extern char* ttyname(int);
 extern int   ttyname_r(int, char *, size_t);
 #endif
 
+/* local definitions in android/android.c */
 char *getusershell(void);
 void setusershell(void);
 void endusershell(void);
@@ -75,6 +76,9 @@ struct __sFILE;
 int addmntent(struct __sFILE *, const struct mntent *);
 struct mntent *getmntent_r(struct __sFILE *fp, struct mntent *mnt, char *buf, int buflen);
 char *hasmntopt(const struct mntent *, const char *);
+
+struct passwd* safegetpwnam(const char *name) FAST_FUNC;
+struct passwd* safegetpwuid(uid_t uid) FAST_FUNC;
 
 #define MNTOPT_NOAUTO "noauto"
 
