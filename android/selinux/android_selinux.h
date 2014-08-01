@@ -103,6 +103,15 @@ extern int selinux_file_context_verify(const char *path, mode_t mode);
 extern int get_default_context(const char* user, const char* fromcon,
 			char ** newcon);
 
+/* Check a permission in the passwd class.
+   Return 0 if granted or -1 otherwise. */
+#define PASSWD__PASSWD  0x001UL
+#define PASSWD__CHFN    0x002UL
+#define PASSWD__CHSH    0x004UL
+#define PASSWD__ROOTOK  0x008UL
+#define PASSWD__CRONTAB 0x010UL
+extern int selinux_check_passwd_access(access_vector_t requested);
+
 #define lgetfilecon_raw(path, context) \
 	lgetfilecon(path, context)
 

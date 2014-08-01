@@ -45,7 +45,7 @@ libbb/time.c libbb/trim.c libbb/u_signal_names.c libbb/udp_io.c libbb/unicode.c 
 libbb/vdprintf.c libbb/verror_msg.c libbb/vfork_daemon_rexec.c libbb/warn_ignoring_args.c libbb/wfopen.c libbb/wfopen_input.c
 libbb/write.c libbb/xatonum.c libbb/xconnect.c libbb/xfunc_die.c libbb/xfuncs.c libbb/xfuncs_printf.c libbb/xgetcwd.c
 libbb/xgethostbyname.c libbb/xreadlink.c libbb/xrealloc_vector.c libbb/xregcomp.c
-libbb/endofname.c libbb/in_ether.c
+libbb/endofname.c libbb/in_ether.c libbb/nuke_str.c
 
 libpwdgrp/uidgid_get.c
 
