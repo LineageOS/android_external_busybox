@@ -105,6 +105,9 @@ extern int selinux_file_context_verify(const char *path, mode_t mode);
 #define security_canonicalize_context_raw(context, newctx) \
 	security_canonicalize_context(context, newctx)
 
+#define getprevcon_raw(context) \
+	getprevcon(context)
+
 #define is_context_customizable(ctx) false
 
 #define selinux_log(type, ...) bb_error_msg(__VA_ARGS__)
