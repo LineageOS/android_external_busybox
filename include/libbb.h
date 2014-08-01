@@ -903,6 +903,8 @@ int get_uidgid(struct bb_uidgid_t*, const char*, int numeric_ok) FAST_FUNC;
 void xget_uidgid(struct bb_uidgid_t*, const char*) FAST_FUNC;
 /* chown-like handling of "user[:[group]" */
 void parse_chown_usergroup_or_die(struct bb_uidgid_t *u, char *user_group) FAST_FUNC;
+struct passwd* safegetpwnam(const char *name) FAST_FUNC;
+struct passwd* safegetpwuid(uid_t uid) FAST_FUNC;
 struct passwd* xgetpwnam(const char *name) FAST_FUNC;
 struct group* xgetgrnam(const char *name) FAST_FUNC;
 struct passwd* xgetpwuid(uid_t uid) FAST_FUNC;
