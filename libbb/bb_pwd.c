@@ -15,9 +15,27 @@
  * pointers to static data (getpwuid)
  */
 
-struct passwd* FAST_FUNC xgetpwnam(const char *name)
+struct passwd* FAST_FUNC safegetpwnam(const char *name)
 {
 	struct passwd *pw = getpwnam(name);
+	if (pw && !pw->pw_passwd) {
+		pw->pw_passwd = "";
+	}
+	return pw;
+}
+
+struct passwd* FAST_FUNC safegetpwuid(uid_t uid)
+{
+	struct passwd *pw = getpwuid(uid);
+	if (pw && !pw->pw_passwd) {
+		pw->pw_passwd = "";
+	}
+	return pw;
+}
+
+struct passwd* FAST_FUNC xgetpwnam(const char *name)
+{
+	struct passwd *pw = safegetpwnam(name);
 	if (!pw)
 		bb_error_msg_and_die("unknown user %s", name);
 	return pw;
@@ -31,10 +49,9 @@ struct group* FAST_FUNC xgetgrnam(const char *name)
 	return gr;
 }
 
-
 struct passwd* FAST_FUNC xgetpwuid(uid_t uid)
 {
-	struct passwd *pw = getpwuid(uid);
+	struct passwd *pw = safegetpwuid(uid);
 	if (!pw)
 		bb_error_msg_and_die("unknown uid %u", (unsigned)uid);
 	return pw;
