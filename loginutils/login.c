@@ -17,8 +17,10 @@
 
 #if ENABLE_SELINUX
 # include <selinux/selinux.h>  /* for is_selinux_enabled()  */
+#ifndef __BIONIC__
 # include <selinux/get_context_list.h> /* for get_default_context() */
 # include <selinux/flask.h> /* for security class definitions  */
+#endif
 #endif
 
 #if ENABLE_PAM
@@ -113,6 +115,7 @@ static void initselinux(char *username, char *full_tty,
 	if (getfilecon(full_tty, &old_tty_sid) < 0) {
 		bb_perror_msg_and_die("getfilecon(%s) failed", full_tty);
 	}
+	/* bionic dont have yet compute_relabel, do not change context */
 	if (security_compute_relabel(*user_sid, old_tty_sid,
 				SECCLASS_CHR_FILE, &new_tty_sid) != 0) {
 		bb_perror_msg_and_die("security_change_sid(%s) failed", full_tty);
@@ -397,7 +400,7 @@ int login_main(int argc UNUSED_PARAM, char **argv)
 					pam_strerror(pamh, pamret), pamret);
 		safe_strncpy(username, "UNKNOWN", sizeof(username));
 #else /* not PAM */
-		pw = getpwnam(username);
+		pw = safegetpwnam(username);
 		if (!pw) {
 			strcpy(username, "UNKNOWN");
 			goto fake_it;
