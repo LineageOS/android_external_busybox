@@ -93,6 +93,16 @@ extern void matchpathcon_checkmatches(char *str);
  */
 extern int selinux_file_context_verify(const char *path, mode_t mode);
 
+/* Get the default security context for a user session for 'user'
+   spawned by 'fromcon' and set *newcon to refer to it.  The context
+   will be one of those authorized by the policy, but the selection
+   of a default is subject to user customizable preferences.
+   If 'fromcon' is NULL, defaults to current context.
+   Returns 0 on success or -1 otherwise.
+   Caller must free via freecon. */
+extern int get_default_context(const char* user, const char* fromcon,
+			char ** newcon);
+
 #define lgetfilecon_raw(path, context) \
 	lgetfilecon(path, context)
 
@@ -105,11 +115,17 @@ extern int selinux_file_context_verify(const char *path, mode_t mode);
 #define security_canonicalize_context_raw(context, newctx) \
 	security_canonicalize_context(context, newctx)
 
+#define getprevcon_raw(context) \
+	getprevcon(context)
+
 #define is_context_customizable(ctx) false
 
 #define selinux_log(type, ...) bb_error_msg(__VA_ARGS__)
 
 #define selinux_policy_root() "/sepolicy"
+
+/* imports from libb */
+extern char *xstrdup(const char *s);
 
 static int selinux_getenforcemode(int *rc)
 {
@@ -123,6 +139,35 @@ static int selinux_getenforcemode(int *rc)
 static const char *selinux_file_contexts_path()
 {
 	return "/file_contexts";
+}
+
+/* create a new context with user name (may be unsafe) */
+int get_default_context(const char* user, const char* fromcon,
+	char ** newcon)
+{
+	char fmt[] = "u:r:%s:s0\0";
+	int len = strlen(user) + strlen(fmt);
+
+	*newcon = malloc(len);
+	snprintf(*newcon, len, fmt, user);
+	if (!(*newcon))
+		return -1;
+	return 0;
+}
+
+/* Compute a relabeling decision and set *newcon to refer to it.
+   Caller must free via freecon.
+   Stub not implemented in bionic, but declared in selinux.h */
+int security_compute_relabel(const char *scon, const char *tcon,
+	security_class_t tclass,
+	char ** newcon)
+{
+	if (tcon)
+		*newcon = xstrdup(tcon);
+
+	if (!(*newcon))
+		return -1;
+	return 0;
 }
 
 #endif /* BB_ANDROID_SELINUX_H */
