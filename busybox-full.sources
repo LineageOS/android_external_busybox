@@ -67,7 +67,7 @@ procps/lsof.c procps/nmeter.c procps/pstree.c procps/pwdx.c procps/smemcap.c
 
 shell/ash.c shell/ash_ptr_hack.c shell/math.c shell/random.c shell/shell_common.c
 
-libbb/selinux_common.c android/selinux/matchpathcon.c
+libbb/selinux_common.c android/selinux/matchpathcon.c android/selinux/stubs.c
 selinux/chcon.c selinux/selinuxenabled.c
 selinux/getenforce.c selinux/sestatus.c selinux/setsebool.c
 selinux/getsebool.c selinux/runcon.c selinux/setenforce.c selinux/setfiles.c selinux/matchpathcon.c
