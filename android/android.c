@@ -10,12 +10,22 @@
 #include <stdlib.h>
 #include "libbb.h"
 
-/* declared in stdlib.h */
-int clearenv()
+#ifndef BIONIC_ICS
+int clearenv(void)
 {
-	environ = NULL;
+	char **P = environ;
+
+	/* should never be NULL */
+	if (!environ)
+		environ = (char **)xzalloc(sizeof(char *));
+
+	if (P != NULL) {
+		for (; *P; ++P)
+			*P = NULL;
+	}
 	return 0;
 }
+#endif
 
 /* no /etc/shells anyway */
 char *getusershell() { return NULL; }
