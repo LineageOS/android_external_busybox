@@ -30,6 +30,7 @@ void endutent(void);
 
 /* defined in bionic/mktemp.c */
 char *mkdtemp(char *);
+char *bb_mktemp(char *);
 
 /* SYSCALLS */
 int    stime(time_t *);

@@ -86,6 +86,9 @@ void* FAST_FUNC memrchr(const void *s, int c, size_t n)
 #endif
 
 #ifndef HAVE_MKDTEMP
+#ifdef __BIONIC__
+#define mktemp(s) bb_mktemp(s)
+#endif
 /* This is now actually part of POSIX.1, but was only added in 2008 */
 char* FAST_FUNC mkdtemp(char *template)
 {

@@ -58,7 +58,7 @@ _mktemp(char *path)
 }
 
 char *
-mktemp(char *path)
+bb_mktemp(char *path)
 {
 	return (_mktemp(path));
 }
