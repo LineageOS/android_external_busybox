@@ -36,7 +36,11 @@
 #endif
 
 
+#ifdef __BIONIC__
+#define TMPDIR          "/data/local/tmp"
+#else
 #define TMPDIR          CONFIG_FEATURE_CROND_DIR
+#endif
 #define CRONTABS        CONFIG_FEATURE_CROND_DIR "/crontabs"
 #ifndef SENDMAIL
 # define SENDMAIL       "sendmail"
