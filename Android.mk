@@ -56,18 +56,22 @@ $(busybox_prepare_full): $(BB_PATH)/busybox-full.config
 	@echo -e ${CL_YLW}"Prepare config for busybox binary"${CL_RST}
 	@rm -rf $(bb_gen)/full
 	@rm -rf $(TARGET_OUT_INTERMEDIATES)/EXECUTABLES/busybox_intermediates
+	@mkdir -p $(TARGET_OUT_INTERMEDIATES)/EXECUTABLES/busybox_intermediates
+	@touch $(TARGET_OUT_INTERMEDIATES)/EXECUTABLES/busybox_intermediates/import_includes
 	@mkdir -p $(@D)
 	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
-	make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
+	+make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
 
 busybox_prepare_minimal := $(bb_gen)/minimal/.config
 $(busybox_prepare_minimal): $(BB_PATH)/busybox-minimal.config
 	@echo -e ${CL_YLW}"Prepare config for libbusybox"${CL_RST}
 	@rm -rf $(bb_gen)/minimal
 	@rm -rf $(TARGET_OUT_INTERMEDIATES)/STATIC_LIBRARIES/libbusybox_intermediates
+	@mkdir -p $(TARGET_OUT_INTERMEDIATES)/STATIC_LIBRARIES/libbusybox_intermediates
+	@touch $(TARGET_OUT_INTERMEDIATES)/STATIC_LIBRARIES/libbusybox_intermediates/import_includes
 	@mkdir -p $(@D)
 	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
-	make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
+	+make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
 
 
 #####################################################################
