@@ -27,6 +27,7 @@ findutils/find.c findutils/grep.c findutils/xargs.c
 
 init/halt.c init/mesg.c
 
+libbb/missing_syscalls.c
 libbb/appletlib.c libbb/ask_confirmation.c libbb/bb_askpass.c libbb/bb_do_delay.c libbb/bb_pwd.c libbb/bb_qsort.c libbb/bb_strtonum.c
 libbb/change_identity.c libbb/chomp.c libbb/compare_string_array.c libbb/concat_path_file.c libbb/concat_subpath_file.c libbb/copy_file.c libbb/copyfd.c
 libbb/crc32.c libbb/percent_decode.c libbb/default_error_retval.c libbb/device_open.c libbb/dump.c libbb/execable.c libbb/fclose_nonstdin.c
@@ -43,8 +44,8 @@ libbb/safe_gethostname.c libbb/safe_poll.c libbb/safe_strncpy.c libbb/safe_write
 libbb/simplify_path.c libbb/single_argv.c libbb/skip_whitespace.c libbb/speed_table.c libbb/str_tolower.c libbb/strrstr.c
 libbb/time.c libbb/trim.c libbb/u_signal_names.c libbb/udp_io.c libbb/unicode.c libbb/uuencode.c
 libbb/vdprintf.c libbb/verror_msg.c libbb/vfork_daemon_rexec.c libbb/warn_ignoring_args.c libbb/wfopen.c libbb/wfopen_input.c
-libbb/write.c libbb/xatonum.c libbb/xconnect.c libbb/xfunc_die.c libbb/xfuncs.c libbb/xfuncs_printf.c libbb/xgetcwd.c
-libbb/xgethostbyname.c libbb/xreadlink.c libbb/xrealloc_vector.c libbb/xregcomp.c
+libbb/write.c libbb/xatonum.c libbb/xconnect.c libbb/xfunc_die.c libbb/xfuncs.c libbb/xfuncs_printf.c
+libbb/xgetcwd.c libbb/xgethostbyname.c libbb/xreadlink.c libbb/xrealloc_vector.c libbb/xregcomp.c
 libbb/endofname.c libbb/in_ether.c libbb/nuke_str.c
 
 libpwdgrp/uidgid_get.c
