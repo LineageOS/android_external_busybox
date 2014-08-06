@@ -33,7 +33,7 @@ char *mkdtemp(char *);
 char *bb_mktemp(char *);
 
 /* SYSCALLS */
-int    stime(time_t *);
+int    stime(const time_t *);
 int    swapon(const char *, int);
 int    swapoff(const char *);
 int    getsid(pid_t);

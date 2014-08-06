@@ -89,9 +89,9 @@ BUSYBOX_SRC_FILES = \
 	android/libc/pty.c \
 	android/android.c
 
-BUSYBOX_ASM_FILES := adjtimex.S stime.S
+BUSYBOX_ASM_FILES =
 ifneq ($(BIONIC_L),true)
-    BUSYBOX_ASM_FILES += getsid.S swapon.S swapoff.S sysinfo.S
+    BUSYBOX_ASM_FILES += swapon.S swapoff.S sysinfo.S
 endif
 
 ifneq ($(filter arm x86 mips,$(TARGET_ARCH)),)
