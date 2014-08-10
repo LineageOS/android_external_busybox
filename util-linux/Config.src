@@ -81,6 +81,14 @@ config FEATURE_DMESG_PRETTY
 	    <6>BIOS-provided physical RAM map:
 	    <6> BIOS-e820: 0000000000000000 - 000000000009f000 (usable)
 
+config FEATURE_DMESG_COLOR
+	bool "Colored dmesg output"
+	default y
+	depends on DMESG
+	help
+	  Allow to show errors and warnings in different colors
+	  dmesg -C
+
 config FBSET
 	bool "fbset"
 	default y
