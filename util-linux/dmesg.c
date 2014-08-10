@@ -67,7 +67,7 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 
 	if ((ENABLE_FEATURE_DMESG_PRETTY || (opts & OPT_C)) && !(opts & OPT_r)) {
 		int last = '\n';
-		int in = 0, l, color;
+		int in = 0, l, color, c;
 		char pfx[16], *lvl;
 
 		/* Skip <[0-9]+> at the start of lines */
@@ -89,12 +89,13 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 					}
 
 					if (color != COLOR_DEFAULT)
-						l = sprintf(pfx, "%c[%d;%d;%dm",
-							0x1B, 38, 5, color);
+						l = sprintf(pfx, "%c[38;5;%dm",
+							0x1B, color);
 					else
-						l = sprintf(pfx, "%c[%dm", 0x1B, 0);
+						l = sprintf(pfx, "%c[0m", 0x1B);
 
-					full_write(STDOUT_FILENO, pfx, l);
+					for (c = 0; c < l; c++)
+						putchar(pfx[c]);
 				}
 				while (buf[in++] != '>' && in < len)
 					;
@@ -108,8 +109,9 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 
 		if (opts & OPT_C) {
 			/* Reset default terminal color */
-			l = sprintf(pfx, "%c[%dm", 0x1B, 0);
-			full_write(STDOUT_FILENO, pfx, l);
+			l = sprintf(pfx, "%c[0m", 0x1B);
+			for (c = 0; c < l; c++)
+				putchar(pfx[c]);
 		}
 
 		/* Make sure we end with a newline */
@@ -123,6 +125,9 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 	}
 
 	if (ENABLE_FEATURE_CLEAN_UP) free(buf);
+
+	if (opts & OPT_C)
+		full_write(STDOUT_FILENO, "%c[0m", 0x1B);
 
 	return EXIT_SUCCESS;
 }
