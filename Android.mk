@@ -55,7 +55,7 @@ busybox_prepare_full := $(bb_gen)/full/.config
 $(busybox_prepare_full): $(BB_PATH)/busybox-full.config
 	@echo -e ${CL_YLW}"Prepare config for busybox binary"${CL_RST}
 	@rm -rf $(bb_gen)/full
-	@rm -f $(shell find $(abspath $(call intermediates-dir-for,EXECUTABLES,busyboxsf)) -name "*.o")
+	@rm -f $(shell find $(abspath $(call intermediates-dir-for,EXECUTABLES,busybox)) -name "*.o")
 	@mkdir -p $(@D)
 	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
 	+make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
