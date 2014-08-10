@@ -23,10 +23,10 @@
 #include "libbb.h"
 
 #define COLOR_DEFAULT 0
-#define COLOR_WHITE   231
-#define COLOR_YELLOW  226
-#define COLOR_ORANGE  166
-#define COLOR_RED     196
+#define COLOR_WHITE   97
+#define COLOR_YELLOW  93
+#define COLOR_ORANGE  33
+#define COLOR_RED     91
 
 int dmesg_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int dmesg_main(int argc UNUSED_PARAM, char **argv)
@@ -34,6 +34,8 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 	int len, level;
 	char *buf;
 	unsigned opts;
+	int c, l, color = 0;
+	char pfx[8];
 	enum {
 		OPT_c = 1 << 0,
 		OPT_s = 1 << 1,
@@ -67,8 +69,8 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 
 	if ((ENABLE_FEATURE_DMESG_PRETTY || (opts & OPT_C)) && !(opts & OPT_r)) {
 		int last = '\n';
-		int in = 0, l, color;
-		char pfx[16], *lvl;
+		int in = 0;
+		char *lvl;
 
 		/* Skip <[0-9]+> at the start of lines */
 		while (1) {
@@ -88,13 +90,9 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 					default: color = COLOR_DEFAULT;
 					}
 
-					if (color != COLOR_DEFAULT)
-						l = sprintf(pfx, "%c[%d;%d;%dm",
-							0x1B, 38, 5, color);
-					else
-						l = sprintf(pfx, "%c[%dm", 0x1B, 0);
-
-					full_write(STDOUT_FILENO, pfx, l);
+					l = sprintf(pfx, "%c[%dm", 0x1B, color);
+					for (c = 0; c < l; c++)
+						putchar(pfx[c]);
 				}
 				while (buf[in++] != '>' && in < len)
 					;
@@ -106,10 +104,11 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 				break;
 		}
 
-		if (opts & OPT_C) {
-			/* Reset default terminal color */
-			l = sprintf(pfx, "%c[%dm", 0x1B, 0);
-			full_write(STDOUT_FILENO, pfx, l);
+		if (color && opts & OPT_C) {
+			l = sprintf(pfx, "%c[0m", 0x1B);
+			for (c = 0; c < l; c++)
+				putchar(pfx[c]);
+			color = 0;
 		}
 
 		/* Make sure we end with a newline */
@@ -123,6 +122,12 @@ int dmesg_main(int argc UNUSED_PARAM, char **argv)
 	}
 
 	if (ENABLE_FEATURE_CLEAN_UP) free(buf);
+
+	if (color && opts & OPT_C) {
+		/* Reset default terminal color */
+		for (c = 0; c < sprintf(pfx, "%c[0m\n", 0x1B); c++)
+			putchar(pfx[c]);
+	}
 
 	return EXIT_SUCCESS;
 }
