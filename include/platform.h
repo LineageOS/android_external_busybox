@@ -458,7 +458,7 @@ typedef unsigned smalluint;
 # undef HAVE_STRVERSCMP
 # undef HAVE_UNLOCKED_LINE_OPS
 # undef HAVE_NET_ETHERNET_H
-# ifndef __i386__
+# if (!defined(__i386__) || !defined(BIONIC_L))
 #  undef HAVE_STPCPY
 # endif
 #endif
