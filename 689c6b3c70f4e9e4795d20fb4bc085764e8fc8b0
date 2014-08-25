@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_a473e04c",
+        "filename": "include/platform.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 7060
+      },
+      "writtenOn": "2014-08-25T13:50:16Z",
+      "side": 1,
+      "message": "Isn\u0027t \"ifndef BIONIC_L\" sufficient? I think stpcpy is defined for all archs in Android L, not only for x86.",
+      "revId": "689c6b3c70f4e9e4795d20fb4bc085764e8fc8b0",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
