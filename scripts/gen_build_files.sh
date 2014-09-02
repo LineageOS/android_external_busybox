@@ -21,15 +21,17 @@ chk() { status "CHK" "$@"; }
 # features in this script, so this uses gsed and warns the user if
 # it does not exist.
 UNAME=$(uname -sm)
-if [[ $UNAME == *Darwin* ]] || [[ $UNAME == *Macintosh* ]]; then
+case "$UNAME" in
+*Darwin*|*Macintosh*)
 	SED_IMPL=$(which gsed)
 	if [ $? != 0 ]; then
 		echo "GNU sed is required for Darwin builds, please install and add 'gsed' to the path"
 		exit 1;
 	fi
-else
+	;;
+*)
 	SED_IMPL=sed
-fi
+esac
 
 generate()
 {
