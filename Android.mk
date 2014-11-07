@@ -20,6 +20,7 @@ LOCAL_C_INCLUDES := $(BB_PATH)/android/librpc
 LOCAL_MODULE := libuclibcrpc
 LOCAL_CFLAGS += -fno-strict-aliasing
 ifeq ($(BIONIC_L),true)
+BIONIC_ICS = true
 LOCAL_CFLAGS += -DBIONIC_ICS -DBIONIC_L
 endif
 include $(BUILD_STATIC_LIBRARY)
@@ -32,10 +33,10 @@ LOCAL_PATH := $(BB_PATH)
 include $(CLEAR_VARS)
 
 # Explicitly set an architecture specific CONFIG_CROSS_COMPILER_PREFIX
-ifeq ($(TARGET_ARCH),arm)
+ifneq ($(filter arm arm64,$(TARGET_ARCH)),)
     BUSYBOX_CROSS_COMPILER_PREFIX := arm-linux-androideabi-
 endif
-ifeq ($(TARGET_ARCH),x86)
+ifneq ($(filter x86 x86_64,$(TARGET_ARCH)),)
     BUSYBOX_CROSS_COMPILER_PREFIX := $(if $(filter x86_64,$(HOST_ARCH)),x86_64,i686)-linux-android-
 endif
 ifeq ($(TARGET_ARCH),mips)
@@ -90,7 +91,7 @@ ifneq ($(BIONIC_L),true)
     BUSYBOX_ASM_FILES += swapon.S swapoff.S sysinfo.S
 endif
 
-ifneq ($(filter arm x86 mips,$(TARGET_ARCH)),)
+ifneq ($(filter arm arm64 x86 x86_64 mips,$(TARGET_ARCH)),)
     BUSYBOX_SRC_FILES += \
         $(addprefix android/libc/arch-$(TARGET_ARCH)/syscalls/,$(BUSYBOX_ASM_FILES))
 else
