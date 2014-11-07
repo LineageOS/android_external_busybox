@@ -32,10 +32,10 @@ LOCAL_PATH := $(BB_PATH)
 include $(CLEAR_VARS)
 
 # Explicitly set an architecture specific CONFIG_CROSS_COMPILER_PREFIX
-ifeq ($(TARGET_ARCH),arm)
+ifneq ($(filter arm arm64,$(TARGET_ARCH)),)
     BUSYBOX_CROSS_COMPILER_PREFIX := arm-linux-androideabi-
 endif
-ifeq ($(TARGET_ARCH),x86)
+ifneq ($(filter x86 x86_64,$(TARGET_ARCH)),)
     BUSYBOX_CROSS_COMPILER_PREFIX := $(if $(filter x86_64,$(HOST_ARCH)),x86_64,i686)-linux-android-
 endif
 ifeq ($(TARGET_ARCH),mips)
@@ -93,8 +93,6 @@ endif
 ifneq ($(filter arm x86 mips,$(TARGET_ARCH)),)
     BUSYBOX_SRC_FILES += \
         $(addprefix android/libc/arch-$(TARGET_ARCH)/syscalls/,$(BUSYBOX_ASM_FILES))
-else
-    $(error $(TARGET_ARCH) is not supported)
 endif
 
 BUSYBOX_C_INCLUDES = \
@@ -162,9 +160,6 @@ include $(CLEAR_VARS)
 BUSYBOX_CONFIG:=full
 BUSYBOX_SUFFIX:=bionic
 LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
-ifeq ($(BIONIC_ICS),true)
-LOCAL_SRC_FILES += android/libc/__set_errno.c
-endif
 LOCAL_C_INCLUDES := $(bb_gen)/full/include $(BUSYBOX_C_INCLUDES)
 LOCAL_CFLAGS := $(BUSYBOX_CFLAGS)
 LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)

@@ -1,3 +1,4 @@
+android/libc/__set_errno.c
 
 archival/bbunzip.c archival/bzip2.c archival/cpio.c archival/gzip.c
 archival/libarchive/lzo1x_1.c archival/libarchive/lzo1x_1o.c archival/libarchive/lzo1x_9x.c archival/libarchive/lzo1x_d.c archival/lzop.c
