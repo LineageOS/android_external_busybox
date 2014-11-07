@@ -38,7 +38,7 @@
 #include <string.h>
 #ifdef ANDROID
 #include <rpc/types.h>
-extern int __set_errno(int n);
+extern long __set_errno(int n);
 #else
 #include <sys/types.h>
 #endif
