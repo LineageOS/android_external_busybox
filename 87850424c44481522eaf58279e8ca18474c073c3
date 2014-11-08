@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a122d0e_f35770c8",
+        "filename": "Android.mk",
+        "patchSetId": 6
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 7060
+      },
+      "writtenOn": "2014-11-08T04:10:22Z",
+      "side": 1,
+      "message": "Move this line below ifneq...",
+      "revId": "87850424c44481522eaf58279e8ca18474c073c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_b35df8ee",
+        "filename": "Android.mk",
+        "patchSetId": 6
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 7060
+      },
+      "writtenOn": "2014-11-08T04:10:22Z",
+      "side": 1,
+      "message": "Suggest move the endif to A",
+      "revId": "87850424c44481522eaf58279e8ca18474c073c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a122d0e_93627cac",
+        "filename": "Android.mk",
+        "patchSetId": 6
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 7060
+      },
+      "writtenOn": "2014-11-08T04:10:22Z",
+      "side": 1,
+      "message": "A",
+      "revId": "87850424c44481522eaf58279e8ca18474c073c3",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
