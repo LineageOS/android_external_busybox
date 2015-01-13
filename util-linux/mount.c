@@ -1926,7 +1926,14 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 				break;
 			mp->mnt_type = next + 1;
 		}
+		// We only attempt to mount the last fstab entry for a particular
+		// mount point. In the case where we thought we knew what type
+		// to mount and it still failed, jump to the loop that tries all
+		// known filesystem types.
+		if (rc != 0 && !(vfsflags & (MS_REMOUNT | MS_BIND | MS_MOVE)))
+			goto attempt_autodetect_fstype;
 	} else {
+attempt_autodetect_fstype:
 		// Loop through filesystem types until mount succeeds
 		// or we run out
 
