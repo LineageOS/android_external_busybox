@@ -1926,7 +1926,10 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 				break;
 			mp->mnt_type = next + 1;
 		}
+		if (rc !=0 && mp->mnt_type)
+			goto attempt_auto_filesystem;
 	} else {
+attempt_auto_filesystem:
 		// Loop through filesystem types until mount succeeds
 		// or we run out
 
