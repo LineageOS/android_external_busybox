@@ -1776,6 +1776,9 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 	int rc = -1;
 	unsigned long vfsflags;
 	char *loopFile = NULL, *filteropts = NULL;
+#if ENABLE_FEATURE_BLKID_TYPE
+        char *detected_fstype = NULL;
+#endif
 	llist_t *fl = NULL;
 	struct stat st;
 
@@ -1783,9 +1786,19 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 
 	vfsflags = parse_mount_options(mp->mnt_opts, &filteropts);
 
+#if ENABLE_FEATURE_BLKID_TYPE
+	detected_fstype = get_fstype_from_devname(mp->mnt_fsname);
+
+	// If fstype is auto or disagrees with blkid, trust blkid's
+	// determination of the filesystem type
+	if ((mp->mnt_type && strcmp(mp->mnt_type, "auto") == 0)
+	    || (detected_fstype != NULL && detected_fstype != mp->mnt_type))
+		mp->mnt_type = detected_fstype;
+#else
 	// Treat fstype "auto" as unspecified
 	if (mp->mnt_type && strcmp(mp->mnt_type, "auto") == 0)
 		mp->mnt_type = NULL;
+#endif
 
 	// Might this be a virtual filesystem?
 	if (ENABLE_FEATURE_MOUNT_HELPERS && strchr(mp->mnt_fsname, '#')) {
