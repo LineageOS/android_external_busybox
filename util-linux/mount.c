@@ -1789,7 +1789,7 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 	// If fstype is auto or disagrees with blkid, trust blkid's
 	// determination of the filesystem type
 	if ((mp->mnt_type && strcmp(mp->mnt_type, "auto") == 0)
-	    || (detected_fstype != NULL && detected_fstype != mp->mnt_type))
+	    || (strcmp(detected_fstype, mp->mnt_type)))
 		mp->mnt_type = detected_fstype;
 
 	// Might this be a virtual filesystem?
