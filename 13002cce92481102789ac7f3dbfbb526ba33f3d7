@@ -34,6 +34,24 @@
       "revId": "13002cce92481102789ac7f3dbfbb526ba33f3d7",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_61826702",
+        "filename": "util-linux/mount.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1792,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2015-02-12T10:41:43Z",
+      "side": 1,
+      "message": "From bb mailing list (10 minutes ago) :\n\nComments:\n- do NOT let code override a user specification.\nIf I specify -t (ntfs|ntfs-3g) or (msdos|vfat) manually, it should force\nmount to try mounting using that specific driver and then *fail* if\nit\u0027s impossible.\nIf fstype overrides user specifications, you may end up breaking future\nfilesystems.\nI would think that this would be better:\n\n            // Treat fstype \"auto\" as unspecified\n            if (mp-\u003emnt_type \u0026\u0026 strcmp(mp-\u003emnt_type, \"auto\") \u003d\u003d 0)\n                    mp-\u003emnt_type \u003d NULL;\n    +#if ENABLE_FEATURE_BLKID_TYPE\n    +       // try to to autodetect type\n    +       if (!mp-\u003emnt_type)\n    +               mp-\u003emnt_type \u003d get_fstype_from_devname(mp-\u003emnt_fsname);\n    #endif\n\nOTOH, if I specify -t auto and userspace code selects the wrong fs type\n(as it surely will, because bugs and unexpected inputs happen...),\nit would be proper for mount to keep retrying, as would be done if\nmp-\u003emnt_type is unset after the new code.\n\n- I\u0027m guessing that the use of !\u003d to compare two strings is a mistake?\n\n    +       || (detected_fstype !\u003d NULL \u0026\u0026 detected_fstype !\u003d mp-\u003emnt_type))\n\n- guess_fstype, fstype, blkid commands:\n guess_fstype is the name that Puppy Linux has used for a command that\n outputs filesystem type without label/uuid.\n fstype is the name that it goes by in Toybox, which is now in Android.\n However, upstream Android turns it off and just uses blkid.\n\nHTH,\nIsaac Dunham",
+      "parentUuid": "bacf61ea_a1957f41",
+      "revId": "13002cce92481102789ac7f3dbfbb526ba33f3d7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
