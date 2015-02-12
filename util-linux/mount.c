@@ -1771,7 +1771,7 @@ static int nfsmount(struct mntent *mp, unsigned long vfsflags, char *filteropts)
 // Mount one directory.  Handles CIFS, NFS, loopback, autobind, and filesystem
 // type detection.  Returns 0 for success, nonzero for failure.
 // NB: mp->xxx fields may be trashed on exit
-static int singlemount(struct mntent *mp, int ignore_busy)
+static int singlemount(struct mntent *mp, int ignore_busy, int user_fstype)
 {
 	int rc = -1;
 	unsigned long vfsflags;
@@ -1786,11 +1786,17 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 
 	detected_fstype = get_fstype_from_devname(mp->mnt_fsname);
 
-	// If fstype is auto or disagrees with blkid, trust blkid's
-	// determination of the filesystem type
-	if ((mp->mnt_type && !strcmp(mp->mnt_type, "auto")) ||
-	    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
-		mp->mnt_type = detected_fstype;
+	if (user_fstype) {
+		// Treat fstype "auto" as unspecified
+		if (mp->mnt_type && !strcmp(mp->mnt_type, "auto"))
+			mp->mnt_type = NULL;
+	} else {
+		// If user didn't specify an fstype and blkid disagrees or the
+		// fstype is "auto", trust blkid's determination of the fstype.
+		if ((mp->mnt_type && !strcmp(mp->mnt_type, "auto")) ||
+		    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
+			mp->mnt_type = detected_fstype;
+	}
 
 	// Might this be a virtual filesystem?
 	if (ENABLE_FEATURE_MOUNT_HELPERS && strchr(mp->mnt_fsname, '#')) {
@@ -2043,6 +2049,7 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 	FILE *fstab;
 	int i, j;
 	int rc = EXIT_SUCCESS;
+	int user_fstype = 0;
 	unsigned long cmdopt_flags;
 	unsigned opt;
 	struct mntent mtpair[2], *mtcur = mtpair;
@@ -2067,6 +2074,10 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 	opt_complementary = "?2o::" IF_FEATURE_MOUNT_VERBOSE("vv");
 	opt = getopt32(argv, OPTION_STR, &lst_o, &fstype, &O_optmatch
 			IF_FEATURE_MOUNT_VERBOSE(, &verbose));
+
+	if (fstype)
+		user_fstype = 1;
+
 	while (lst_o) append_mount_options(&cmdopts, llist_pop(&lst_o)); // -o
 	if (opt & OPT_r) append_mount_options(&cmdopts, "ro"); // -r
 	if (opt & OPT_w) append_mount_options(&cmdopts, "rw"); // -w
@@ -2109,7 +2120,7 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 			mtpair->mnt_type = fstype;
 			mtpair->mnt_opts = cmdopts;
 			resolve_mount_spec(&mtpair->mnt_fsname);
-			rc = singlemount(mtpair, /*ignore_busy:*/ 0);
+			rc = singlemount(mtpair, /*ignore_busy:*/ 0, user_fstype);
 			return rc;
 		}
 		storage_path = bb_simplify_path(argv[0]); // malloced
@@ -2222,7 +2233,7 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 				}
 			} else {
 				// ...mount this thing
-				if (singlemount(mtcur, /*ignore_busy:*/ 1)) {
+				if (singlemount(mtcur, /*ignore_busy:*/ 1, user_fstype)) {
 					// Count number of failed mounts
 					rc++;
 				}
@@ -2280,7 +2291,7 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 			mtcur->mnt_opts = xstrdup(mtcur->mnt_opts);
 			append_mount_options(&(mtcur->mnt_opts), cmdopts);
 			resolve_mount_spec(&mtpair->mnt_fsname);
-			rc = singlemount(mtcur, /*ignore_busy:*/ 0);
+			rc = singlemount(mtcur, /*ignore_busy:*/ 0, user_fstype);
 			if (ENABLE_FEATURE_CLEAN_UP)
 				free(mtcur->mnt_opts);
 		//}
