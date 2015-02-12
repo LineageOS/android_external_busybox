@@ -16,6 +16,24 @@
       "revId": "e8375fa41dc65926d2c2d5f17ca3efbcb3f56e79",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bacf61ea_e4902598",
+        "filename": "util-linux/mount.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 1792,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2015-02-12T15:00:34Z",
+      "side": 1,
+      "message": "yep, there was that before ;)\n\n    // Treat fstype \"auto\" as unspecified\n    if (mp-\u003emnt_type \u0026\u0026 strcmp(mp-\u003emnt_type, \"auto\") \u003d\u003d 0)\n        mp-\u003emnt_type \u003d NULL;\n\nso you can remove the NULL check ;p",
+      "parentUuid": "bacf61ea_4481314a",
+      "revId": "e8375fa41dc65926d2c2d5f17ca3efbcb3f56e79",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
