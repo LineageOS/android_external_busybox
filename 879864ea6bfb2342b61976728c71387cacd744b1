@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bacf61ea_37254dab",
+        "filename": "util-linux/mount.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 1802,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2015-02-13T08:12:01Z",
+      "side": 1,
+      "message": "did you try with an unformatted partition ? what is the detected_fstype value in this case... NULL or something else ?",
+      "revId": "879864ea6bfb2342b61976728c71387cacd744b1",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
