@@ -270,7 +270,7 @@ char *get_fstype_from_devname(const char *device)
 {
 #if ENABLE_FEATURE_BLKID_TYPE
 	struct uuidCache_s *uc;
-	struct stat *statbuf;
+	struct stat *statbuf = NULL;
 
 	if (stat(device, statbuf) < 0)
 		return NULL;
@@ -281,7 +281,7 @@ char *get_fstype_from_devname(const char *device)
 	add_to_uuid_cache(device);
 	uc = uuidcache_init(0);
 
-	return uc->type;
+	return (char*)uc->type;
 #else
 	return NULL;
 #endif
