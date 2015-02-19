@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bacf61ea_4bb932e9",
+        "filename": "util-linux/volume_id/get_devname.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2015-02-19T12:07:40Z",
+      "side": 1,
+      "message": "stat usage should be stat(file, \u0026buf) with a real struct stat statbuf",
+      "revId": "94a88434ac6d97ebd7cc2677e76a9754603a12e9",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
