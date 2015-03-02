@@ -341,7 +341,6 @@ struct globals {
 	unsigned verbose;
 #endif
 	llist_t *fslist;
-	int user_fstype;
 	char getmntent_buf[1];
 } FIX_ALIASING;
 enum { GETMNTENT_BUFSIZE = COMMON_BUFSIZE - offsetof(struct globals, getmntent_buf) };
@@ -353,7 +352,6 @@ enum { GETMNTENT_BUFSIZE = COMMON_BUFSIZE - offsetof(struct globals, getmntent_b
 #define verbose           0
 #endif
 #define fslist            (G.fslist           )
-#define user_fstype       (G.user_fstype      )
 #define getmntent_buf     (G.getmntent_buf    )
 #define INIT_G() do { } while (0)
 
@@ -1778,7 +1776,6 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 	int rc = -1;
 	unsigned long vfsflags;
 	char *loopFile = NULL, *filteropts = NULL;
-	char *detected_fstype = NULL;
 	llist_t *fl = NULL;
 	struct stat st;
 
@@ -1786,20 +1783,9 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 
 	vfsflags = parse_mount_options(mp->mnt_opts, &filteropts);
 
-	if (user_fstype) {
-		// Treat fstype "auto" as unspecified
-		if (mp->mnt_type && !strcmp(mp->mnt_type, "auto"))
-			mp->mnt_type = NULL;
-	} else {
-		// If user didn't specify an fstype and blkid disagrees or the
-		// fstype is "auto", trust blkid's determination of the fstype.
-
-		detected_fstype = get_fstype_from_devname(mp->mnt_fsname);
-
-		if ((mp->mnt_type && !strcmp(mp->mnt_type, "auto")) ||
-		    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
-			mp->mnt_type = detected_fstype;
-	}
+	// Treat fstype "auto" as unspecified
+	if (mp->mnt_type && strcmp(mp->mnt_type, "auto") == 0)
+		mp->mnt_type = NULL;
 
 	// Might this be a virtual filesystem?
 	if (ENABLE_FEATURE_MOUNT_HELPERS && strchr(mp->mnt_fsname, '#')) {
@@ -2076,8 +2062,6 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 	opt_complementary = "?2o::" IF_FEATURE_MOUNT_VERBOSE("vv");
 	opt = getopt32(argv, OPTION_STR, &lst_o, &fstype, &O_optmatch
 			IF_FEATURE_MOUNT_VERBOSE(, &verbose));
-
-	if (opt & OPT_t) user_fstype = 1;
 	while (lst_o) append_mount_options(&cmdopts, llist_pop(&lst_o)); // -o
 	if (opt & OPT_r) append_mount_options(&cmdopts, "ro"); // -r
 	if (opt & OPT_w) append_mount_options(&cmdopts, "rw"); // -w
@@ -2291,8 +2275,6 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 			mtcur->mnt_opts = xstrdup(mtcur->mnt_opts);
 			append_mount_options(&(mtcur->mnt_opts), cmdopts);
 			resolve_mount_spec(&mtpair->mnt_fsname);
-			if (user_fstype)
-				mtcur->mnt_type = fstype;
 			rc = singlemount(mtcur, /*ignore_busy:*/ 0);
 			if (ENABLE_FEATURE_CLEAN_UP)
 				free(mtcur->mnt_opts);
