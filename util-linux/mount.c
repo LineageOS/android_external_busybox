@@ -1786,19 +1786,20 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 
 	vfsflags = parse_mount_options(mp->mnt_opts, &filteropts);
 
-	if (user_fstype) {
-		// Treat fstype "auto" as unspecified
-		if (mp->mnt_type && !strcmp(mp->mnt_type, "auto"))
-			mp->mnt_type = NULL;
-	} else {
-		// If user didn't specify an fstype and blkid disagrees or the
-		// fstype is "auto", trust blkid's determination of the fstype.
+	if (mp->mnt_type) {
+		if (user_fstype) {
+			// Treat fstype "auto" as unspecified
+			if (!strcmp(mp->mnt_type, "auto"))
+				mp->mnt_type = NULL;
+		} else {
+			// If user didn't specify an fstype and blkid disagrees or the
+			// fstype is "auto", trust blkid's determination of the fstype.
+			detected_fstype = get_fstype_from_devname(mp->mnt_fsname);
 
-		detected_fstype = get_fstype_from_devname(mp->mnt_fsname);
-
-		if ((mp->mnt_type && !strcmp(mp->mnt_type, "auto")) ||
-		    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
-			mp->mnt_type = detected_fstype;
+			if (!strcmp(mp->mnt_type, "auto") ||
+			    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
+				mp->mnt_type = detected_fstype;
+		}
 	}
 
 	// Might this be a virtual filesystem?
