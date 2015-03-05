@@ -1790,13 +1790,12 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 		// Treat fstype "auto" as unspecified
 		if (mp->mnt_type && !strcmp(mp->mnt_type, "auto"))
 			mp->mnt_type = NULL;
-	} else {
+	} else if (mp->mnt_type) {
 		// If user didn't specify an fstype and blkid disagrees or the
 		// fstype is "auto", trust blkid's determination of the fstype.
-
 		detected_fstype = get_fstype_from_devname(mp->mnt_fsname);
 
-		if ((mp->mnt_type && !strcmp(mp->mnt_type, "auto")) ||
+		if (!strcmp(mp->mnt_type, "auto") ||
 		    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
 			mp->mnt_type = detected_fstype;
 	}
