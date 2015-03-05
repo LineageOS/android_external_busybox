@@ -281,7 +281,7 @@ char *get_fstype_from_devname(const char *device)
 	add_to_uuid_cache(device);
 	uc = uuidcache_init(0);
 
-	return (char*)uc->type;
+	return (uc != NULL ? (char*)uc->type : NULL);
 #else
 	return NULL;
 #endif
