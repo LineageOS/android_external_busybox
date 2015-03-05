@@ -1796,9 +1796,10 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 
 		detected_fstype = get_fstype_from_devname(mp->mnt_fsname);
 
-		if ((mp->mnt_type && !strcmp(mp->mnt_type, "auto")) ||
-		    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
-			mp->mnt_type = detected_fstype;
+		if (mp->mnt_type)
+			if (!strcmp(mp->mnt_type, "auto") ||
+			    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
+				mp->mnt_type = detected_fstype;
 	}
 
 	// Might this be a virtual filesystem?
