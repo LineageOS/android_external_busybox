@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ad45d7e_357433ce",
+        "filename": "util-linux/mount.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1800,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2015-03-06T13:11:08Z",
+      "side": 1,
+      "message": "mp-\u003emnt_type \u0026\u0026 is tested twice",
+      "revId": "73ad4d827c6e0bf095f3bcf534be564f734c8052",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
