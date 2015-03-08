@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ad45d7e_6d541f54",
+        "filename": "util-linux/mount.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 1792,
+      "author": {
+        "id": 2936
+      },
+      "writtenOn": "2015-03-08T09:57:09Z",
+      "side": 1,
+      "message": "Maybe just do if (mp-\u003emnt_type \u0026\u0026 !strcmp(mp-\u003emnt_type, \"auto\")) to avoid the excessive reindentation?",
+      "revId": "808adbe335ea3494c4b039d87df37a4c3935d572",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
