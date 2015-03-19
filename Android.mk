@@ -31,16 +31,7 @@ include $(BUILD_STATIC_LIBRARY)
 LOCAL_PATH := $(BB_PATH)
 include $(CLEAR_VARS)
 
-# Explicitly set an architecture specific CONFIG_CROSS_COMPILER_PREFIX
-ifneq ($(filter arm arm64,$(TARGET_ARCH)),)
-    BUSYBOX_CROSS_COMPILER_PREFIX := arm-linux-androideabi-
-endif
-ifneq ($(filter x86 x86_64,$(TARGET_ARCH)),)
-    BUSYBOX_CROSS_COMPILER_PREFIX := $(if $(filter x86_64,$(HOST_ARCH)),x86_64,i686)-linux-android-
-endif
-ifeq ($(TARGET_ARCH),mips)
-    BUSYBOX_CROSS_COMPILER_PREFIX := mipsel-linux-android-
-endif
+BUSYBOX_CROSS_COMPILER_PREFIX := $(abspath $(TARGET_TOOLS_PREFIX))
 
 BB_PREPARE_FLAGS:=
 ifeq ($(HOST_OS),darwin)
