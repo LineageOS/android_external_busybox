@@ -32,7 +32,10 @@ LOCAL_PATH := $(BB_PATH)
 include $(CLEAR_VARS)
 
 # Explicitly set an architecture specific CONFIG_CROSS_COMPILER_PREFIX
-ifneq ($(filter arm arm64,$(TARGET_ARCH)),)
+ifneq ($(filter arm64,$(TARGET_ARCH)),)
+    BUSYBOX_CROSS_COMPILER_PREFIX := aarch64-linux-android-
+endif
+ifneq ($(filter arm,$(TARGET_ARCH)),)
     BUSYBOX_CROSS_COMPILER_PREFIX := arm-linux-androideabi-
 endif
 ifneq ($(filter x86 x86_64,$(TARGET_ARCH)),)
