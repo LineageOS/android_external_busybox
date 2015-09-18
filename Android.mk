@@ -209,3 +209,29 @@ LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
 include $(BUILD_EXECUTABLE)
+
+include $(CLEAR_VARS)
+
+BUSYBOX_CONFIG:=minimal
+BUSYBOX_SUFFIX:=static_min
+LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
+LOCAL_C_INCLUDES := $(bb_gen)/minimal/include $(BUSYBOX_C_INCLUDES)
+LOCAL_CFLAGS := $(BUSYBOX_CFLAGS)
+LOCAL_CFLAGS += \
+  -Dgetusershell=busybox_getusershell \
+  -Dsetusershell=busybox_setusershell \
+  -Dendusershell=busybox_endusershell \
+  -Dgetmntent=busybox_getmntent \
+  -Dgetmntent_r=busybox_getmntent_r \
+  -Dgenerate_uuid=busybox_generate_uuid
+LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)
+LOCAL_FORCE_STATIC_EXECUTABLE := true
+LOCAL_MODULE := static_min_busybox
+LOCAL_MODULE_STEM := busybox
+LOCAL_MODULE_TAGS := optional
+LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc libselinux
+LOCAL_MODULE_CLASS := UTILITY_EXECUTABLES
+LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)/sbin
+LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
+LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_minimal)
+include $(BUILD_EXECUTABLE)
