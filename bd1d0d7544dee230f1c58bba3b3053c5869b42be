@@ -33,6 +33,29 @@
       "revId": "bd1d0d7544dee230f1c58bba3b3053c5869b42be",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f436f4f_38bc6868",
+        "filename": "Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2015-10-03T19:55:53Z",
+      "side": 1,
+      "message": "conflicts with the other one, should be named differently or put in a different folder (mm -B)",
+      "range": {
+        "startLine": 230,
+        "startChar": 20,
+        "endLine": 230,
+        "endChar": 21
+      },
+      "revId": "bd1d0d7544dee230f1c58bba3b3053c5869b42be",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
     }
   ]
 }
