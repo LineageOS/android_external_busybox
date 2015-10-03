@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f436f4f_38a34852",
+        "filename": "Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 6334
+      },
+      "writtenOn": "2015-10-03T18:58:54Z",
+      "side": 1,
+      "message": "CONFIG :\u003d minimal",
+      "revId": "bd1d0d7544dee230f1c58bba3b3053c5869b42be",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f436f4f_188884c4",
+        "filename": "Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 6334
+      },
+      "writtenOn": "2015-10-03T18:58:54Z",
+      "side": 1,
+      "message": "SUFFIX :\u003d static_min",
+      "revId": "bd1d0d7544dee230f1c58bba3b3053c5869b42be",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
