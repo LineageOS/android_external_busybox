@@ -40,6 +40,7 @@
 #include <features.h>
 
 #include <errno.h>
+#include <strings.h>
 #include <unistd.h>
 #include "rpc_private.h"
 #include <rpc/svc.h>
