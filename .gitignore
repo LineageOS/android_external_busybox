@@ -37,3 +37,10 @@ Config.in
 core
 .gdb_history
 .gdbinit
+
+#
+# testing output
+#
+/busybox.links
+/runtest-tempdir-links
+/testsuite/echo-ne

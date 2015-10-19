@@ -50,11 +50,19 @@ static int FAST_FUNC parse_module(const char *fname, struct stat *sb UNUSED_PARA
 	*first = info;
 
 	info->dnext = info->dprev = info;
+/*
 	if (strncmp(fname, "./", 2) == 0)
 		info->name = xstrdup(fname + 2);
 	else
 		info->name = xstrdup(fname);
 	info->modname = xstrdup(filename2modname(fname, modname));
+*/
+	info->name = xstrdup(fname + 2); /* skip "./" */
+	info->modname = xstrdup(
+		filename2modname(
+			bb_get_last_path_component_nostrip(fname),
+			modname
+	));
 	for (ptr = image; ptr < image + len - 10; ptr++) {
 		if (strncmp(ptr, "depends=", 8) == 0) {
 			char *u;
@@ -245,17 +253,18 @@ int depmod_main(int argc UNUSED_PARAM, char **argv)
 	if (!(option_mask32 & OPT_n))
 		xfreopen_write("modules.alias", stdout);
 	for (m = modules; m != NULL; m = m->next) {
+		char modname[MODULE_NAME_LEN];
 		const char *fname = bb_basename(m->name);
-		int fnlen = strchrnul(fname, '.') - fname;
+		filename2modname(fname, modname);
 		while (m->aliases) {
 			/* Last word can well be m->modname instead,
 			 * but depmod from module-init-tools 3.4
 			 * uses module basename, i.e., no s/-/_/g.
 			 * (pathname and .ko.* are still stripped)
 			 * Mimicking that... */
-			printf("alias %s %.*s\n",
+			printf("alias %s %s\n",
 				(char*)llist_pop(&m->aliases),
-				fnlen, fname);
+				modname);
 		}
 	}
 #endif
@@ -263,12 +272,13 @@ int depmod_main(int argc UNUSED_PARAM, char **argv)
 	if (!(option_mask32 & OPT_n))
 		xfreopen_write("modules.symbols", stdout);
 	for (m = modules; m != NULL; m = m->next) {
+		char modname[MODULE_NAME_LEN];
 		const char *fname = bb_basename(m->name);
-		int fnlen = strchrnul(fname, '.') - fname;
+		filename2modname(fname, modname);
 		while (m->symbols) {
-			printf("alias symbol:%s %.*s\n",
+			printf("alias symbol:%s %s\n",
 				(char*)llist_pop(&m->symbols),
-				fnlen, fname);
+				modname);
 		}
 	}
 #endif
