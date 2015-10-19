@@ -48,13 +48,17 @@ int FAST_FUNC string_to_llist(char *string, llist_t **llist, const char *delim)
 char* FAST_FUNC filename2modname(const char *filename, char *modname)
 {
 	int i;
-	char *from;
+	const char *from;
 
 	if (filename == NULL)
 		return NULL;
 	if (modname == NULL)
 		modname = xmalloc(MODULE_NAME_LEN);
-	from = bb_get_last_path_component_nostrip(filename);
+	// Disabled since otherwise "modprobe dir/name" would work
+	// as if it is "modprobe name". It is unclear why
+	// 'basenamization' was here in the first place.
+	//from = bb_get_last_path_component_nostrip(filename);
+	from = filename;
 	for (i = 0; i < (MODULE_NAME_LEN-1) && from[i] != '\0' && from[i] != '.'; i++)
 		modname[i] = (from[i] == '-') ? '_' : from[i];
 	modname[i] = '\0';
@@ -113,7 +117,7 @@ void* FAST_FUNC try_to_mmap_module(const char *filename, size_t *image_size_p)
 	fstat(fd, &st);
 	image = NULL;
 	/* st.st_size is off_t, we can't just pass it to mmap */
-	if (st.st_size <= *image_size_p) {
+	if ((size_t)(st.st_size) <= *image_size_p) {
 		size_t image_size = st.st_size;
 		image = mmap(NULL, image_size, PROT_READ, MAP_PRIVATE, fd, 0);
 		if (image == MAP_FAILED) {

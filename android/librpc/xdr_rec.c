@@ -248,7 +248,7 @@ xdrrec_getint32 (XDR *xdrs, int32_t *ip)
 static bool_t
 xdrrec_getlong (XDR *xdrs, long *lp)
 {
-  int32_t v;
+  int32_t v = 0;
   bool_t r = xdrrec_getint32 (xdrs, &v);
   *lp = v;
   return r;

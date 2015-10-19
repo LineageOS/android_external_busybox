@@ -5473,7 +5473,7 @@ weak_function
 #endif
 bb_regerror (errcode, preg, errbuf, errbuf_size)
     int errcode;
-    const regex_t *preg;
+    const regex_t *preg __attribute__((__unused__));
     char *errbuf;
     size_t errbuf_size;
 {

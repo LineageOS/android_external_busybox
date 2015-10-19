@@ -1540,12 +1540,14 @@ static void chain_group(void)
 			debug_printf_parse("%s: OC_BREAK\n", __func__);
 			n = chain_node(OC_EXEC);
 			n->a.n = break_ptr;
+			chain_expr(t_info);
 			break;
 
 		case OC_CONTINUE:
 			debug_printf_parse("%s: OC_CONTINUE\n", __func__);
 			n = chain_node(OC_EXEC);
 			n->a.n = continue_ptr;
+			chain_expr(t_info);
 			break;
 
 		/* delete, next, nextfile, return, exit */
@@ -2151,7 +2153,7 @@ static int awk_sub(node *rn, const char *repl, int nm, var *src, var *dest, int 
 {
 	char *resbuf;
 	const char *sp;
-	int match_no, residx, replen, resbufsize;
+	int match_no, residx, replen, resbufsize = 0;
 	int regexec_flags;
 	regmatch_t pmatch[10];
 	regex_t sreg, *regex;

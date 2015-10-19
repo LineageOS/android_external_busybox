@@ -1,8 +1,8 @@
 LOCAL_PATH := $(call my-dir)
 BB_PATH := $(LOCAL_PATH)
 
-# Bionic Branches Switches (GB/ICS/L)
-BIONIC_ICS := false
+# Bionic Branch (GB/ICS/L/M) (Last include previous flags)
+BIONIC_M := true
 BIONIC_L := true
 
 # Make a static library for regex.
@@ -94,7 +94,6 @@ BUSYBOX_C_INCLUDES = \
 	bionic/libm \
 	libc/kernel/common \
 	external/libselinux/include \
-	external/selinux/libsepol/include \
 	$(BB_PATH)/android/regex \
 	$(BB_PATH)/android/librpc
 
@@ -107,6 +106,13 @@ BUSYBOX_CFLAGS = \
 	-include $(bb_gen)/$(BUSYBOX_CONFIG)/include/autoconf.h \
 	-D'CONFIG_DEFAULT_MODULES_DIR="$(KERNEL_MODULES_DIR)"' \
 	-D'BB_VER="$(strip $(shell $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
+
+ifeq ($(BIONIC_M),true)
+    BUSYBOX_C_INCLUDES += external/selinux/libsepol/include
+    BIONIC_L := true
+else
+    BUSYBOX_C_INCLUDES += external/libsepol/include
+endif
 
 ifeq ($(BIONIC_L),true)
     BUSYBOX_CFLAGS += -DBIONIC_L
@@ -164,7 +170,7 @@ include $(BUILD_EXECUTABLE)
 
 BUSYBOX_LINKS := $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).links)
 # nc is provided by external/netcat
-exclude := nc
+exclude := nc ping ping6
 SYMLINKS := $(addprefix $(TARGET_OUT_OPTIONAL_EXECUTABLES)/,$(filter-out $(exclude),$(notdir $(BUSYBOX_LINKS))))
 $(SYMLINKS): BUSYBOX_BINARY := $(LOCAL_MODULE)
 $(SYMLINKS): $(LOCAL_INSTALLED_MODULE)
