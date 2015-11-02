@@ -33,12 +33,6 @@ include $(CLEAR_VARS)
 
 BUSYBOX_CROSS_COMPILER_PREFIX := $(abspath $(TARGET_TOOLS_PREFIX))
 
-BB_PREPARE_FLAGS:=
-ifeq ($(HOST_OS),darwin)
-    BB_HOSTCC := $(ANDROID_BUILD_TOP)/prebuilts/gcc/darwin-x86/host/i686-apple-darwin-4.2.1/bin/i686-apple-darwin11-gcc
-    BB_PREPARE_FLAGS := HOSTCC=$(BB_HOSTCC)
-endif
-
 # On aosp (master), path is relative, not on cm (kitkat)
 bb_gen := $(abspath $(TARGET_OUT_INTERMEDIATES)/busybox)
 
@@ -49,7 +43,7 @@ $(busybox_prepare_full): $(BB_PATH)/busybox-full.config
 	@rm -f $(shell find $(abspath $(call intermediates-dir-for,EXECUTABLES,busybox)) -name "*.o")
 	@mkdir -p $(@D)
 	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
-	+make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
+	+make -C $(BB_PATH) prepare O=$(@D)
 
 busybox_prepare_minimal := $(bb_gen)/minimal/.config
 $(busybox_prepare_minimal): $(BB_PATH)/busybox-minimal.config
@@ -58,7 +52,7 @@ $(busybox_prepare_minimal): $(BB_PATH)/busybox-minimal.config
 	@rm -f $(shell find $(abspath $(call intermediates-dir-for,STATIC_LIBRARIES,libbusybox)) -name "*.o")
 	@mkdir -p $(@D)
 	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
-	+make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
+	+make -C $(BB_PATH) prepare O=$(@D)
 
 
 #####################################################################
