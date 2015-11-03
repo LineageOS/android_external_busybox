@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f2f7f8d_aeaa5716",
+        "filename": "Android.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1039
+      },
+      "writtenOn": "2015-11-03T03:40:51Z",
+      "side": 0,
+      "message": "maybe we should keep this line to hide host warnings -Wno-....",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 16
+      },
+      "revId": "8477f6ffb9c0ea1196bae5115fa2b2602f203aba",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
