@@ -157,8 +157,6 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
 LOCAL_CLANG := false
 include $(BUILD_EXECUTABLE)
 
-ifeq ($(WITH_BUSYBOX_LINKS),true)
-
 BUSYBOX_LINKS := $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).links)
 # nc is provided by external/netcat
 exclude := nc
@@ -177,7 +175,6 @@ ALL_DEFAULT_INSTALLED_MODULES += $(SYMLINKS)
 ALL_MODULES.$(LOCAL_MODULE).INSTALLED := \
     $(ALL_MODULES.$(LOCAL_MODULE).INSTALLED) $(SYMLINKS)
 
-endif
 
 # Static Busybox
 
