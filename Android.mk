@@ -62,7 +62,7 @@ include $(CLEAR_VARS)
 
 KERNEL_MODULES_DIR ?= /system/lib/modules
 
-SUBMAKE := mkdir -p $(bb_gen) && make -s -C $(BB_PATH) CC=$(CC)
+SUBMAKE := mkdir -p $(bb_gen) && make -s --no-print-directory -C $(BB_PATH) CC=$(CC)
 
 BUSYBOX_SRC_FILES = \
 	$(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).sources) \
