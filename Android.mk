@@ -153,7 +153,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
 LOCAL_SHARED_LIBRARIES := libc libcutils libm
 LOCAL_STATIC_LIBRARIES := libclearsilverregex libuclibcrpc libselinux
-LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full) busybox_symlinks
+LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full) busybox_links
 LOCAL_CLANG := false
 
 BUSYBOX_BINARY := $(LOCAL_MODULE)
@@ -164,7 +164,7 @@ include $(BUILD_EXECUTABLE)
 LOCAL_PATH := $(BB_PATH)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := busybox_symlinks
+LOCAL_MODULE := busybox_links
 LOCAL_MODULE_TAGS := optional
 
 # nc is provided by external/netcat
