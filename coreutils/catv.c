@@ -10,6 +10,17 @@
 /* See "Cat -v considered harmful" at
  * http://cm.bell-labs.com/cm/cs/doc/84/kp.ps.gz */
 
+//config:config CATV
+//config:	bool "catv"
+//config:	default y
+//config:	help
+//config:	  Display nonprinting characters as escape sequences (like some
+//config:	  implementations' cat -v option).
+
+//applet:IF_CATV(APPLET(catv, BB_DIR_BIN, BB_SUID_DROP))
+
+//kbuild:lib-$(CONFIG_CATV) += catv.o
+
 //usage:#define catv_trivial_usage
 //usage:       "[-etv] [FILE]..."
 //usage:#define catv_full_usage "\n\n"
@@ -19,6 +30,17 @@
 //usage:     "\n	-v	Don't use ^x or M-x escapes"
 
 #include "libbb.h"
+#include "common_bufsiz.h"
+
+#define CATV_OPT_e (1<<0)
+#define CATV_OPT_t (1<<1)
+#define CATV_OPT_v (1<<2)
+struct BUG_const_mismatch {
+	char BUG_const_mismatch[
+		CATV_OPT_e == VISIBLE_ENDLINE && CATV_OPT_t == VISIBLE_SHOW_TABS
+		? 1 : -1
+	];
+};
 
 int catv_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int catv_main(int argc UNUSED_PARAM, char **argv)
@@ -26,14 +48,6 @@ int catv_main(int argc UNUSED_PARAM, char **argv)
 	int retval = EXIT_SUCCESS;
 	int fd;
 	unsigned opts;
-#define CATV_OPT_e (1<<0)
-#define CATV_OPT_t (1<<1)
-#define CATV_OPT_v (1<<2)
-	typedef char BUG_const_mismatch[
-		CATV_OPT_e == VISIBLE_ENDLINE && CATV_OPT_t == VISIBLE_SHOW_TABS
-		? 1 : -1
-	];
-
 	opts = getopt32(argv, "etv");
 	argv += optind;
 #if 0 /* These consts match, we can just pass "opts" to visible() */
@@ -46,6 +60,9 @@ int catv_main(int argc UNUSED_PARAM, char **argv)
 	/* Read from stdin if there's nothing else to do. */
 	if (!argv[0])
 		*--argv = (char*)"-";
+
+#define read_buf bb_common_bufsiz1
+	setup_common_bufsiz();
 	do {
 		fd = open_or_warn_stdin(*argv);
 		if (fd < 0) {
@@ -55,7 +72,6 @@ int catv_main(int argc UNUSED_PARAM, char **argv)
 		for (;;) {
 			int i, res;
 
-#define read_buf bb_common_bufsiz1
 			res = read(fd, read_buf, COMMON_BUFSIZE);
 			if (res < 0)
 				retval = EXIT_FAILURE;

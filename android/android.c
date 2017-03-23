@@ -91,6 +91,6 @@ char *hasmntopt(const struct mntent *mnt, const char *opt)
 #if !ENABLE_USE_BB_PWD_GRP
 int setpwent() { return 0; }
 void setgrent() {}
-void endgrent() {}
+//Defined in libbb.h
+//void endgrent() {}
 #endif
-

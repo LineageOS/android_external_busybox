@@ -62,6 +62,27 @@
  * Modified for BusyBox by Erik Andersen <andersen@debian.org> --
  *	removed getopt based parser and added a hand rolled one.
  */
+//config:config MKFS_MINIX
+//config:	bool "mkfs_minix"
+//config:	default y
+//config:	select PLATFORM_LINUX
+//config:	help
+//config:	  The minix filesystem is a nice, small, compact, read-write filesystem
+//config:	  with little overhead. If you wish to be able to create minix
+//config:	  filesystems this utility will do the job for you.
+//config:
+//config:config FEATURE_MINIX2
+//config:	bool "Support Minix fs v2 (fsck_minix/mkfs_minix)"
+//config:	default y
+//config:	depends on FSCK_MINIX || MKFS_MINIX
+//config:	help
+//config:	  If you wish to be able to create version 2 minix filesystems, enable
+//config:	  this. If you enabled 'mkfs_minix' then you almost certainly want to
+//config:	  be using the version 2 filesystem support.
+
+//applet:IF_MKFS_MINIX(APPLET_ODDNAME(mkfs.minix, mkfs_minix, BB_DIR_SBIN, BB_SUID_DROP, mkfs_minix))
+
+//kbuild:lib-$(CONFIG_MKFS_MINIX) += mkfs_minix.o
 
 //usage:#define mkfs_minix_trivial_usage
 //usage:       "[-c | -l FILE] [-nXX] [-iXX] BLOCKDEV [KBYTES]"
@@ -576,11 +597,11 @@ static void setup_tables(void)
 	for (i = MINIX_ROOT_INO; i <= SB_INODES; i++)
 		unmark_inode(i);
 	G.inode_buffer = xzalloc(INODE_BUFFER_SIZE);
-	printf("%ld inodes\n", (long)SB_INODES);
-	printf("%ld blocks\n", (long)SB_ZONES);
-	printf("Firstdatazone=%ld (%ld)\n", (long)SB_FIRSTZONE, (long)norm_firstzone);
-	printf("Zonesize=%d\n", BLOCK_SIZE << SB_ZONE_SIZE);
-	printf("Maxsize=%ld\n", (long)SB_MAXSIZE);
+	printf("%lu inodes\n", (unsigned long)SB_INODES);
+	printf("%lu blocks\n", (unsigned long)SB_ZONES);
+	printf("Firstdatazone=%lu (%lu)\n", (unsigned long)SB_FIRSTZONE, (unsigned long)norm_firstzone);
+	printf("Zonesize=%u\n", BLOCK_SIZE << SB_ZONE_SIZE);
+	printf("Maxsize=%lu\n", (unsigned long)SB_MAXSIZE);
 }
 
 int mkfs_minix_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
@@ -604,8 +625,7 @@ int mkfs_minix_main(int argc UNUSED_PARAM, char **argv)
 		bb_error_msg_and_die("bad inode size");
 #endif
 
-	opt_complementary = "n+"; /* -n N */
-	opt = getopt32(argv, "ci:l:n:v", &str_i, &listfile, &G.namelen);
+	opt = getopt32(argv, "ci:l:n:+v", &str_i, &listfile, &G.namelen);
 	argv += optind;
 	//if (opt & 1) -c
 	if (opt & 2) G.req_nr_inodes = xatoul(str_i); // -i

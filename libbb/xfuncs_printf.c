@@ -112,6 +112,11 @@ char* FAST_FUNC xstrndup(const char *s, int n)
 	return memcpy(t, s, n);
 }
 
+void* FAST_FUNC xmemdup(const void *s, int n)
+{
+	return memcpy(xmalloc(n), s, n);
+}
+
 // Die if we can't open a file and return a FILE* to it.
 // Notice we haven't got xfread(), This is for use with fscanf() and friends.
 FILE* FAST_FUNC xfopen(const char *path, const char *mode)
@@ -230,8 +235,16 @@ void FAST_FUNC xwrite(int fd, const void *buf, size_t count)
 {
 	if (count) {
 		ssize_t size = full_write(fd, buf, count);
-		if ((size_t)size != count)
-			bb_error_msg_and_die("short write");
+		if ((size_t)size != count) {
+			/*
+			 * Two cases: write error immediately;
+			 * or some writes succeeded, then we hit an error.
+			 * In either case, errno is set.
+			 */
+			bb_perror_msg_and_die(
+				size >= 0 ? "short write" : "write error"
+			);
+		}
 	}
 }
 void FAST_FUNC xwrite_str(int fd, const char *str)
@@ -322,11 +335,13 @@ char* FAST_FUNC xasprintf(const char *format, ...)
 
 void FAST_FUNC xsetenv(const char *key, const char *value)
 {
+
 #ifdef __BIONIC__
 	/* on login, can be NULL, and should not be for bionic */
 	if (environ == NULL)
 		bb_error_msg_and_die("environment is not initialized");
 #endif
+
 	if (setenv(key, value, 1))
 		bb_error_msg_and_die("%s", bb_msg_memory_exhausted);
 }
@@ -388,6 +403,12 @@ void FAST_FUNC xchdir(const char *path)
 {
 	if (chdir(path))
 		bb_perror_msg_and_die("can't change directory to '%s'", path);
+}
+
+void FAST_FUNC xfchdir(int fd)
+{
+	if (fchdir(fd))
+		bb_perror_msg_and_die("fchdir");
 }
 
 void FAST_FUNC xchroot(const char *path)
@@ -649,7 +670,23 @@ pid_t FAST_FUNC xfork(void)
 	pid_t pid;
 	pid = fork();
 	if (pid < 0) /* wtf? */
-		bb_perror_msg_and_die("vfork"+1);
+		bb_perror_msg_and_die("%s", "vfork"+1);
 	return pid;
 }
 #endif
+
+void FAST_FUNC xvfork_parent_waits_and_exits(void)
+{
+	pid_t pid;
+
+	fflush_all();
+	pid = xvfork();
+	if (pid > 0) {
+		/* Parent */
+		int exit_status = wait_for_exitstatus(pid);
+		if (WIFSIGNALED(exit_status))
+			kill_myself_with_sig(WTERMSIG(exit_status));
+		_exit(WEXITSTATUS(exit_status));
+	}
+	/* Child continues */
+}
