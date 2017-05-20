@@ -4,6 +4,7 @@ BB_PATH := $(LOCAL_PATH)
 # Bionic Branches Switches (GB/ICS/L)
 BIONIC_ICS := false
 BIONIC_L := true
+BIONIC_N := true
 
 # Make a static library for regex.
 include $(CLEAR_VARS)
@@ -19,8 +20,8 @@ LOCAL_SRC_FILES := $(shell cat $(BB_PATH)/android/librpc.sources)
 LOCAL_C_INCLUDES := $(BB_PATH)/android/librpc
 LOCAL_MODULE := libuclibcrpc
 LOCAL_CFLAGS += -fno-strict-aliasing
-ifeq ($(BIONIC_L),true)
-LOCAL_CFLAGS += -DBIONIC_ICS -DBIONIC_L
+ifeq ($(BIONIC_N),true)
+LOCAL_CFLAGS += -DBIONIC_ICS -DBIONIC_L -D BIONIC_N
 endif
 include $(BUILD_STATIC_LIBRARY)
 
@@ -102,9 +103,12 @@ BUSYBOX_CFLAGS = \
 	-D'CONFIG_DEFAULT_MODULES_DIR="$(KERNEL_MODULES_DIR)"' \
 	-D'BB_VER="$(strip $(shell $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
 
-ifeq ($(BIONIC_L),true)
+ifeq ($(BIONIC_N),true)
     BUSYBOX_CFLAGS += -DBIONIC_L
     BUSYBOX_AFLAGS += -DBIONIC_L
+    BUSYBOX_CFLAGS += -DBIONIC_N
+    BUSYBOX_AFLAGS += -DBIONIC_N
+    BUSYBOX_CFLAGS += -D_GNU_SOURCE
     # include changes for ICS/JB/KK
     BIONIC_ICS := true
 endif
