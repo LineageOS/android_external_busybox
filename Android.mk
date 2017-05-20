@@ -105,6 +105,7 @@ BUSYBOX_CFLAGS = \
 ifeq ($(BIONIC_L),true)
     BUSYBOX_CFLAGS += -DBIONIC_L
     BUSYBOX_AFLAGS += -DBIONIC_L
+    BUSYBOX_CFLAGS += -D_GNU_SOURCE
     # include changes for ICS/JB/KK
     BIONIC_ICS := true
 endif
