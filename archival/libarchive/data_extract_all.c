@@ -22,7 +22,7 @@ void FAST_FUNC data_extract_all(archive_handle_t *archive_handle)
 	char *sctx = archive_handle->tar__sctx[PAX_NEXT_FILE];
 
 #ifdef __BIONIC__
-	matchpathcon_init(NULL);
+	matchpathcon_init("/file_contexts");
 #endif
 
 	if (!sctx)
