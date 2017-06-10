@@ -47,7 +47,12 @@ generate()
 		# copy stdin to stdout
 		cat
 		# print everything after INSERT line
-		$SED_IMPL -n '/^INSERT$/ { :l; n; p; bl }' "${src}"
+		$SED_IMPL -n '/^INSERT$/ {
+		:l
+		    n
+		    p
+		    bl
+		}' "${src}"
 	} >"${dst}.tmp"
 	if ! cmp -s "${dst}" "${dst}.tmp"; then
 		gen "${dst}"
@@ -68,7 +73,12 @@ $SED_IMPL -n 's@^//applet:@@p' "$srctree"/*/*.c "$srctree"/*/*/*.c \
 # We add line continuation backslash after each line,
 # and insert empty line before each line which doesn't start
 # with space or tab
-$SED_IMPL -n -e 's@^//usage:\([ \t].*\)$@\1 \\@p' -e 's@^//usage:\([^ \t].*\)$@\n\1 \\@p' \
+TAB="$(printf '\tX')"
+TAB="${TAB%X}"
+LF="$(printf '\nX')"
+LF="${LF%X}"
+$SED_IMPL -n -e 's@^//usage:\([ '"$TAB"'].*\)$@\1 \\@p' \
+       -e 's@^//usage:\([^ '"$TAB"'].*\)$@\'"$LF"'\1 \\@p' \
 	"$srctree"/*/*.c "$srctree"/*/*/*.c \
 | generate \
 	"$srctree/include/usage.src.h" \
@@ -77,7 +87,7 @@ $SED_IMPL -n -e 's@^//usage:\([ \t].*\)$@\1 \\@p' -e 's@^//usage:\([^ \t].*\)$@\
 
 # (Re)generate */Kbuild and */Config.in
 # We skip .dotdirs - makes git/svn/etc users happier
-{ cd -- "$srctree" && find . -type d -not '(' -name '.?*' -prune ')'; } \
+{ cd -- "$srctree" && find . -type d ! '(' -name '.?*' -prune ')'; } \
 | while read -r d; do
 	d="${d#./}"
 

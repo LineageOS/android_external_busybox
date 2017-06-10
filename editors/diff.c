@@ -125,6 +125,7 @@
 //usage:     "\n	-w	Ignore all whitespace"
 
 #include "libbb.h"
+#include "common_bufsiz.h"
 
 #if 0
 # define dbg_error_msg(...) bb_error_msg(__VA_ARGS__)
@@ -363,7 +364,7 @@ static void stone(const int *a, int n, const int *b, int *J, int pref)
 }
 
 struct line {
-	/* 'serial' is not used in the begining, so we reuse it
+	/* 'serial' is not used in the beginning, so we reuse it
 	 * to store line offsets, thus reducing memory pressure
 	 */
 	union {
@@ -433,7 +434,7 @@ static void fetch(FILE_and_pos_t *ft, const off_t *ix, int a, int b, int ch)
 		for (j = 0, col = 0; j < ix[i] - ix[i - 1]; j++) {
 			int c = fgetc(ft->ft_fp);
 			if (c == EOF) {
-				printf("\n\\ No newline at end of file\n");
+				puts("\n\\ No newline at end of file");
 				return;
 			}
 			ft->ft_pos++;
@@ -475,7 +476,7 @@ static NOINLINE int *create_J(FILE_and_pos_t ft[2], int nlen[2], off_t *ix[2])
 	for (i = 0; i < 2; i++) {
 		unsigned hash;
 		token_t tok;
-		int sz = 100;
+		size_t sz = 100;
 		nfile[i] = xmalloc((sz + 3) * sizeof(nfile[i][0]));
 		/* ft gets here without the correct position, cant use seek_ft */
 		ft[i].ft_pos = 0;
@@ -658,8 +659,8 @@ static bool diff(FILE* fp[2], char *file[2])
 				}
 
 				for (j = 0; j < 2; j++)
-					for (k = v[j].a; k < v[j].b; k++)
-						nonempty |= (ix[j][k+1] - ix[j][k] != 1);
+					for (k = v[j].a; k <= v[j].b; k++)
+						nonempty |= (ix[j][k] - ix[j][k - 1] != 1);
 
 				vec = xrealloc_vector(vec, 6, ++idx);
 				memcpy(vec[idx], v, sizeof(v));
@@ -692,7 +693,7 @@ static bool diff(FILE* fp[2], char *file[2])
 					continue;
 				printf(",%d", (a < b) ? b - a + 1 : 0);
 			}
-			printf(" @@\n");
+			puts(" @@");
 			/*
 			 * Output changes in "unified" diff format--the old and new lines
 			 * are printed together.
@@ -734,26 +735,30 @@ static int diffreg(char *file[2])
 		 * When we meet non-seekable file, we must make a temp copy.
 		 */
 		if (lseek(fd, 0, SEEK_SET) == -1 && errno == ESPIPE) {
+			
 			/* really should use $TMPDIR, but not usually set on android anyway
 			   here with ifdef, android will use "/data/local/tmp/difXXXXXX"
 			 */
-			char name[] = 
+			char name[] =
 #ifdef __BIONIC__
 				"/data/local"
 #endif
 				"/tmp/difXXXXXX";
+			
 			int fd_tmp = xmkstemp(name);
 
 			unlink(name);
 			if (bb_copyfd_eof(fd, fd_tmp) < 0)
 				xfunc_die();
-			if (fd) /* Prevents closing of stdin */
+			if (fd != STDIN_FILENO)
 				close(fd);
 			fd = fd_tmp;
+			xlseek(fd, 0, SEEK_SET);
 		}
 		fp[i] = fdopen(fd, "r");
 	}
 
+	setup_common_bufsiz();
 	while (1) {
 		const size_t sz = COMMON_BUFSIZE / 2;
 		char *const buf0 = bb_common_bufsiz1;
@@ -986,11 +991,11 @@ int diff_main(int argc UNUSED_PARAM, char **argv)
 	INIT_G();
 
 	/* exactly 2 params; collect multiple -L <label>; -U N */
-	opt_complementary = "=2:L::U+";
+	opt_complementary = "=2";
 #if ENABLE_FEATURE_DIFF_LONG_OPTIONS
 	applet_long_options = diff_longopts;
 #endif
-	getopt32(argv, "abdiL:NqrsS:tTU:wupBE",
+	getopt32(argv, "abdiL:*NqrsS:tTU:+wupBE",
 			&L_arg, &s_start, &opt_U_context);
 	argv += optind;
 	while (L_arg)

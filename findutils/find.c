@@ -137,6 +137,16 @@
 //config:	  Support the 'find -exec' option for executing commands based upon
 //config:	  the files matched.
 //config:
+//config:config FEATURE_FIND_EXEC_PLUS
+//config:	bool "Enable -exec ... {} +"
+//config:	default y
+//config:	depends on FEATURE_FIND_EXEC
+//config:	help
+//config:	  Support the 'find -exec ... {} +' option for executing commands
+//config:	  for all matched files at once.
+//config:	  Without this option, -exec + is a synonym for -exec ;
+//config:	  (IOW: it works correctly, but without expected speedup)
+//config:
 //config:config FEATURE_FIND_USER
 //config:	bool "Enable -user: username/uid matching"
 //config:	default y
@@ -319,6 +329,9 @@
 //usage:     "\n	-exec CMD ARG ;	Run CMD with all instances of {} replaced by"
 //usage:     "\n			file name. Fails if CMD exits with nonzero"
 //usage:	)
+//usage:	IF_FEATURE_FIND_EXEC_PLUS(
+//usage:     "\n	-exec CMD ARG + Run CMD with {} replaced by list of file names"
+//usage:	)
 //usage:	IF_FEATURE_FIND_DELETE(
 //usage:     "\n	-delete		Delete current file/directory. Turns on -depth option"
 //usage:	)
@@ -329,6 +342,7 @@
 
 #include <fnmatch.h>
 #include "libbb.h"
+#include "common_bufsiz.h"
 #if ENABLE_FEATURE_FIND_REGEX
 # include "xregex.h"
 #endif
@@ -337,8 +351,12 @@
 # define FNM_CASEFOLD 0
 #endif
 
-#define dbg(...) ((void)0)
-/* #define dbg(...) bb_error_msg(__VA_ARGS__) */
+#if 1
+# define dbg(...) ((void)0)
+#else
+# define dbg(...) bb_error_msg(__VA_ARGS__)
+#endif
+
 
 /* This is a NOEXEC applet. Be very careful! */
 
@@ -370,12 +388,25 @@ IF_FEATURE_FIND_MMIN(   ACTS(mmin,  char mmin_char; unsigned mmin_mins;))
 IF_FEATURE_FIND_NEWER(  ACTS(newer, time_t newer_mtime;))
 IF_FEATURE_FIND_INUM(   ACTS(inum,  ino_t inode_num;))
 IF_FEATURE_FIND_USER(   ACTS(user,  uid_t uid;))
-IF_FEATURE_FIND_SIZE(   ACTS(size,  char size_char; filesize_t size;))
+IF_FEATURE_FIND_SIZE(   ACTS(size,  char size_char; filesize_t size;)) 
 IF_FEATURE_FIND_CONTEXT(ACTS(context, security_context_t context;))
 IF_FEATURE_FIND_PAREN(  ACTS(paren, action ***subexpr;))
 IF_FEATURE_FIND_PRUNE(  ACTS(prune))
 IF_FEATURE_FIND_DELETE( ACTS(delete))
-IF_FEATURE_FIND_EXEC(   ACTS(exec,  char **exec_argv; unsigned *subst_count; int exec_argc;))
+IF_FEATURE_FIND_EXEC(   ACTS(exec,
+				char **exec_argv; /* -exec ARGS */
+				unsigned *subst_count;
+				int exec_argc; /* count of ARGS */
+				IF_FEATURE_FIND_EXEC_PLUS(
+					/*
+					 * filelist is NULL if "exec ;"
+					 * non-NULL if "exec +"
+					 */
+					char **filelist;
+					int filelist_idx;
+					int file_len;
+				)
+				))
 IF_FEATURE_FIND_GROUP(  ACTS(group, gid_t gid;))
 IF_FEATURE_FIND_LINKS(  ACTS(links, char links_char; unsigned links_count;))
 
@@ -389,48 +420,19 @@ struct globals {
 	smallint need_print;
 	smallint xdev_on;
 	recurse_flags_t recurse_flags;
+	IF_FEATURE_FIND_EXEC_PLUS(unsigned max_argv_len;)
 } FIX_ALIASING;
-#define G (*(struct globals*)&bb_common_bufsiz1)
+#define G (*(struct globals*)bb_common_bufsiz1)
 #define INIT_G() do { \
-	struct G_sizecheck { \
-		char G_sizecheck[sizeof(G) > COMMON_BUFSIZE ? -1 : 1]; \
-	}; \
+	setup_common_bufsiz(); \
+	BUILD_BUG_ON(sizeof(G) > COMMON_BUFSIZE); \
 	/* we have to zero it out because of NOEXEC */ \
 	memset(&G, 0, sizeof(G)); \
 	IF_FEATURE_FIND_MAXDEPTH(G.minmaxdepth[1] = INT_MAX;) \
+	IF_FEATURE_FIND_EXEC_PLUS(G.max_argv_len = bb_arg_max() - 2048;) \
 	G.need_print = 1; \
 	G.recurse_flags = ACTION_RECURSE; \
 } while (0)
-
-#if ENABLE_FEATURE_FIND_EXEC
-static unsigned count_subst(const char *str)
-{
-	unsigned count = 0;
-	while ((str = strstr(str, "{}")) != NULL) {
-		count++;
-		str++;
-	}
-	return count;
-}
-
-
-static char* subst(const char *src, unsigned count, const char* filename)
-{
-	char *buf, *dst, *end;
-	size_t flen = strlen(filename);
-	/* we replace each '{}' with filename: growth by strlen-2 */
-	buf = dst = xmalloc(strlen(src) + count*(flen-2) + 1);
-	while ((end = strstr(src, "{}"))) {
-		memcpy(dst, src, end - src);
-		dst += end - src;
-		src = end + 2;
-		memcpy(dst, filename, flen);
-		dst += flen;
-	}
-	strcpy(dst, src);
-	return buf;
-}
-#endif
 
 /* Return values of ACTFs ('action functions') are a bit mask:
  * bit 1=1: prune (use SKIP constant for setting it)
@@ -482,7 +484,6 @@ static int exec_actions(action ***appp, const char *fileName, const struct stat 
 	return rc ^ TRUE; /* restore TRUE bit */
 }
 
-
 #if !FNM_CASEFOLD
 static char *strcpy_upcase(char *dst, const char *src)
 {
@@ -501,26 +502,54 @@ static char *strcpy_upcase(char *dst, const char *src)
 
 ACTF(name)
 {
+	int r;
 	const char *tmp = bb_basename(fileName);
-	if (tmp != fileName && *tmp == '\0') {
-		/* "foo/bar/". Oh no... go back to 'b' */
-		tmp--;
-		while (tmp != fileName && *--tmp != '/')
-			continue;
-		if (*tmp == '/')
-			tmp++;
+	/* GNU findutils: find DIR/ -name DIR
+	 * prints "DIR/" (DIR// prints "DIR//" etc).
+	 * Need to strip trailing "/".
+	 * Such names can come only from top-level names, but
+	 * we can't do this before recursive_action() call,
+	 * since then "find FILE/ -name FILE"
+	 * would also work (on non-directories), which is wrong.
+	 */
+	char *trunc_slash = NULL;
+
+	if (*tmp == '\0') {
+		/* "foo/bar/[//...]" */
+		while (tmp != fileName && tmp[-1] == '/')
+			tmp--;
+		if (tmp == fileName) { /* entire fileName is "//.."? */
+			/* yes, convert "//..." to "/"
+			 * Testcases:
+			 * find / -maxdepth 1 -name /: prints /
+			 * find // -maxdepth 1 -name /: prints //
+			 * find / -maxdepth 1 -name //: prints nothing
+			 * find // -maxdepth 1 -name //: prints nothing
+			 */
+			if (tmp[1])
+				trunc_slash = (char*)tmp + 1;
+		} else {
+			/* no, it's "foo/bar/[//...]", go back to 'b' */
+			trunc_slash = (char*)tmp;
+			while (tmp != fileName && tmp[-1] != '/')
+				tmp--;
+		}
 	}
+
 	/* Was using FNM_PERIOD flag too,
 	 * but somewhere between 4.1.20 and 4.4.0 GNU find stopped using it.
 	 * find -name '*foo' should match .foo too:
 	 */
+	if (trunc_slash) *trunc_slash = '\0';
 #if FNM_CASEFOLD
-	return fnmatch(ap->pattern, tmp, (ap->iname ? FNM_CASEFOLD : 0)) == 0;
+	r = fnmatch(ap->pattern, tmp, (ap->iname ? FNM_CASEFOLD : 0));
 #else
 	if (ap->iname)
 		tmp = strcpy_upcase(alloca(strlen(tmp) + 1), tmp);
-	return fnmatch(ap->pattern, tmp, 0) == 0;
+	r = fnmatch(ap->pattern, tmp, 0);
 #endif
+	if (trunc_slash) *trunc_slash = '/';
+	return r == 0;
 }
 
 #if ENABLE_FEATURE_FIND_PATH
@@ -557,8 +586,8 @@ ACTF(type)
 #if ENABLE_FEATURE_FIND_PERM
 ACTF(perm)
 {
-	/* -perm +mode: at least one of perm_mask bits are set */
-	if (ap->perm_char == '+')
+	/* -perm [+/]mode: at least one of perm_mask bits are set */
+	if (ap->perm_char == '+' || ap->perm_char == '/')
 		return (statbuf->st_mode & ap->perm_mask) != 0;
 	/* -perm -mode: all of perm_mask are set */
 	if (ap->perm_char == '-')
@@ -606,17 +635,57 @@ ACTF(inum)
 }
 #endif
 #if ENABLE_FEATURE_FIND_EXEC
-ACTF(exec)
+static int do_exec(action_exec *ap, const char *fileName)
 {
 	int i, rc;
-#if ENABLE_USE_PORTABLE_CODE
-	char **argv = alloca(sizeof(char*) * (ap->exec_argc + 1));
-#else /* gcc 4.3.1 generates smaller code: */
-	char *argv[ap->exec_argc + 1];
-#endif
-	for (i = 0; i < ap->exec_argc; i++)
-		argv[i] = subst(ap->exec_argv[i], ap->subst_count[i], fileName);
-	argv[i] = NULL; /* terminate the list */
+# if ENABLE_FEATURE_FIND_EXEC_PLUS
+	int size = ap->exec_argc + ap->filelist_idx + 1;
+# else
+	int size = ap->exec_argc + 1;
+# endif
+# if ENABLE_USE_PORTABLE_CODE
+	char **argv = alloca(sizeof(char*) * size);
+# else /* gcc 4.3.1 generates smaller code: */
+	char *argv[size];
+# endif
+	char **pp = argv;
+
+	for (i = 0; i < ap->exec_argc; i++) {
+		const char *arg = ap->exec_argv[i];
+
+# if ENABLE_FEATURE_FIND_EXEC_PLUS
+		if (ap->filelist) {
+			/* Handling "-exec +"
+			 * Only one exec_argv[i] has substitution in it.
+			 * Expand that one exec_argv[i] into file list.
+			 */
+			if (ap->subst_count[i] == 0) {
+				*pp++ = xstrdup(arg);
+			} else {
+				int j = 0;
+				while (ap->filelist[j]) {
+					/* 2nd arg here should be ap->subst_count[i], but it is always 1: */
+					*pp++ = xmalloc_substitute_string(arg, 1, "{}", ap->filelist[j]);
+					free(ap->filelist[j]);
+					j++;
+				}
+			}
+		} else
+# endif
+		{
+			/* Handling "-exec ;" */
+			*pp++ = xmalloc_substitute_string(arg, ap->subst_count[i], "{}", fileName);
+		}
+	}
+	*pp = NULL; /* terminate the list */
+
+# if ENABLE_FEATURE_FIND_EXEC_PLUS
+	if (ap->filelist) {
+		ap->filelist[0] = NULL;
+		ap->filelist_idx = 0;
+		ap->file_len = 0;
+	}
+# endif
 
 	rc = spawn_and_wait(argv);
 	if (rc < 0)
@@ -627,6 +696,48 @@ ACTF(exec)
 		free(argv[i++]);
 	return rc == 0; /* return 1 if exitcode 0 */
 }
+ACTF(exec)
+{
+# if ENABLE_FEATURE_FIND_EXEC_PLUS
+	if (ap->filelist) {
+		int rc;
+
+		ap->filelist = xrealloc_vector(ap->filelist, 8, ap->filelist_idx);
+		ap->filelist[ap->filelist_idx++] = xstrdup(fileName);
+		ap->file_len += strlen(fileName) + sizeof(char*) + 1;
+		/* If we have lots of files already, exec the command */
+		rc = 1;
+		if (ap->file_len >= G.max_argv_len)
+			rc = do_exec(ap, NULL);
+		return rc;
+	}
+# endif
+	return do_exec(ap, fileName);
+}
+# if ENABLE_FEATURE_FIND_EXEC_PLUS
+static int flush_exec_plus(void)
+{
+	action *ap;
+	action **app;
+	action ***appp = G.actions;
+	while ((app = *appp++) != NULL) {
+		while ((ap = *app++) != NULL) {
+			if (ap->f == (action_fp)func_exec) {
+				action_exec *ae = (void*)ap;
+				if (ae->filelist_idx != 0) {
+					int rc = do_exec(ae, NULL);
+#  if ENABLE_FEATURE_FIND_NOT
+					if (ap->invert) rc = !rc;
+#  endif
+					if (rc == 0)
+						return 1;
+				}
+			}
+		}
+	}
+	return 0;
+}
+# endif
 #endif
 #if ENABLE_FEATURE_FIND_USER
 ACTF(user)
@@ -685,7 +796,10 @@ ACTF(delete)
 {
 	int rc;
 	if (S_ISDIR(statbuf->st_mode)) {
-		rc = rmdir(fileName);
+		/* "find . -delete" skips rmdir(".") */
+		rc = 0;
+		if (NOT_LONE_CHAR(fileName, '.'))
+			rc = rmdir(fileName);
 	} else {
 		rc = unlink(fileName);
 	}
@@ -798,7 +912,7 @@ static int find_type(const char *type)
 		mask = S_IFSOCK;
 
 	if (mask == 0 || type[1] != '\0')
-		bb_error_msg_and_die(bb_msg_invalid_arg, type, "-type");
+		bb_error_msg_and_die(bb_msg_invalid_arg_to, type, "-type");
 
 	return mask;
 }
@@ -1067,6 +1181,7 @@ static action*** parse_params(char **argv)
 		else if (parm == PARM_exec) {
 			int i;
 			action_exec *ap;
+			IF_FEATURE_FIND_EXEC_PLUS(int all_subst = 0;)
 			dbg("%d", __LINE__);
 			G.need_print = 0;
 			ap = ALLOC_ACTION(exec);
@@ -1079,10 +1194,13 @@ static action*** parse_params(char **argv)
 				// executes "echo Foo >FILENAME<",
 				// find -exec echo Foo ">{}<" "+"
 				// executes "echo Foo FILENAME1 FILENAME2 FILENAME3...".
-				// TODO (so far we treat "+" just like ";")
 				if ((argv[0][0] == ';' || argv[0][0] == '+')
 				 && argv[0][1] == '\0'
 				) {
+# if ENABLE_FEATURE_FIND_EXEC_PLUS
+					if (argv[0][0] == '+')
+						ap->filelist = xzalloc(sizeof(ap->filelist[0]));
+# endif
 					break;
 				}
 				argv++;
@@ -1092,8 +1210,17 @@ static action*** parse_params(char **argv)
 				bb_error_msg_and_die(bb_msg_requires_arg, arg);
 			ap->subst_count = xmalloc(ap->exec_argc * sizeof(int));
 			i = ap->exec_argc;
-			while (i--)
-				ap->subst_count[i] = count_subst(ap->exec_argv[i]);
+			while (i--) {
+				ap->subst_count[i] = count_strstr(ap->exec_argv[i], "{}");
+				IF_FEATURE_FIND_EXEC_PLUS(all_subst += ap->subst_count[i];)
+			}
+# if ENABLE_FEATURE_FIND_EXEC_PLUS
+			/*
+			 * coreutils expects {} to appear only once in "-exec +"
+			 */
+			if (all_subst != 1 && ap->filelist)
+				bb_error_msg_and_die("only one '{}' allowed for -exec +");
+# endif
 		}
 #endif
 #if ENABLE_FEATURE_FIND_PAREN
@@ -1156,16 +1283,17 @@ static action*** parse_params(char **argv)
 /* -perm BITS   File's mode bits are exactly BITS (octal or symbolic).
  *              Symbolic modes use mode 0 as a point of departure.
  * -perm -BITS  All of the BITS are set in file's mode.
- * -perm +BITS  At least one of the BITS is set in file's mode.
+ * -perm [+/]BITS  At least one of the BITS is set in file's mode.
  */
 		else if (parm == PARM_perm) {
 			action_perm *ap;
 			dbg("%d", __LINE__);
 			ap = ALLOC_ACTION(perm);
 			ap->perm_char = arg1[0];
-			arg1 = plus_minus_num(arg1);
+			arg1 = (arg1[0] == '/' ? arg1+1 : plus_minus_num(arg1));
 			/*ap->perm_mask = 0; - ALLOC_ACTION did it */
-			if (!bb_parse_mode(arg1, &ap->perm_mask))
+			ap->perm_mask = bb_parse_mode(arg1, ap->perm_mask);
+			if (ap->perm_mask == (mode_t)-1)
 				bb_error_msg_and_die("invalid mode '%s'", arg1);
 		}
 #endif
@@ -1364,9 +1492,10 @@ int find_main(int argc UNUSED_PARAM, char **argv)
 				NULL,           /* user data */
 				0)              /* depth */
 		) {
-			status = EXIT_FAILURE;
+			status |= EXIT_FAILURE;
 		}
 	}
 
+	IF_FEATURE_FIND_EXEC_PLUS(status |= flush_exec_plus();)
 	return status;
 }

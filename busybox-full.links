@@ -7,6 +7,7 @@
 /bin/base64
 /bin/basename
 /bin/bbconfig
+/sbin/blkdiscard
 /sbin/blkid
 /sbin/blockdev
 /sbin/brctl
@@ -51,6 +52,7 @@
 /bin/expand
 /bin/expr
 /bin/false
+/bin/fatattr
 /sbin/fbsplash
 /sbin/fdisk
 /bin/fgconsole
@@ -80,6 +82,10 @@
 /bin/head
 /bin/hexdump
 /sbin/hwclock
+/sbin/i2cdetect
+/sbin/i2cdump
+/sbin/i2cget
+/sbin/i2cset
 /bin/id
 /sbin/ifconfig
 /sbin/inetd
@@ -180,6 +186,7 @@
 /bin/sha256sum
 /bin/sha3sum
 /bin/sha512sum
+/bin/shuf
 /bin/sleep
 /bin/smemcap
 /bin/sort
@@ -209,14 +216,17 @@
 /bin/tr
 /bin/traceroute
 /bin/true
+/bin/truncate
 /bin/ttysize
 /sbin/tune2fs
+/sbin/ubirename
 /bin/umount
 /bin/uname
 /bin/uncompress
 /bin/unexpand
 /bin/uniq
 /bin/unix2dos
+/bin/unlink
 /bin/unlzma
 /bin/unlzop
 /bin/unxz

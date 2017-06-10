@@ -11,9 +11,6 @@
  *
  * Added FEATURE_UPTIME_UTMP_SUPPORT flag.
  */
-
-/* getopt not needed */
-
 //config:config UPTIME
 //config:	bool "uptime"
 //config:	default y
@@ -29,6 +26,10 @@
 //config:	depends on UPTIME && FEATURE_UTMP
 //config:	help
 //config:	  Makes uptime display the number of users currently logged on.
+
+//applet:IF_UPTIME(APPLET(uptime, BB_DIR_USR_BIN, BB_SUID_DROP))
+
+//kbuild:lib-$(CONFIG_UPTIME) += uptime.o
 
 //usage:#define uptime_trivial_usage
 //usage:       ""
@@ -81,10 +82,10 @@ int uptime_main(int argc UNUSED_PARAM, char **argv UNUSED_PARAM)
 
 #if ENABLE_FEATURE_UPTIME_UTMP_SUPPORT
 	{
-		struct utmp *ut;
+		struct utmpx *ut;
 		unsigned users = 0;
-		while ((ut = getutent()) != NULL) {
-			if ((ut->ut_type == USER_PROCESS) && (ut->ut_name[0] != '\0'))
+		while ((ut = getutxent()) != NULL) {
+			if ((ut->ut_type == USER_PROCESS) && (ut->ut_user[0] != '\0'))
 				users++;
 		}
 		printf(",  %u users", users);

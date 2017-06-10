@@ -9,6 +9,7 @@
 #define UDHCP_COMMON_H 1
 
 #include "libbb.h"
+#include "common_bufsiz.h"
 #include <netinet/udp.h>
 #include <netinet/ip.h>
 
@@ -152,6 +153,7 @@ enum {
 //#define DHCP_VLAN_ID          0x84 /* 802.1P VLAN ID */
 //#define DHCP_VLAN_PRIORITY    0x85 /* 802.1Q VLAN priority */
 //#define DHCP_PXE_CONF_FILE    0xd1 /* RFC 5071 Configuration File */
+//#define DHCP_PXE_PATH_PREFIX  0xd2 /* RFC 5071 Configuration File */
 //#define DHCP_MS_STATIC_ROUTES 0xf9 /* Microsoft's pre-RFC 3442 code for 0x79? */
 //#define DHCP_WPAD             0xfc /* MSIE's Web Proxy Autodiscovery Protocol */
 #define DHCP_END                0xff
@@ -255,16 +257,16 @@ struct option_set *udhcp_find_option(struct option_set *opt_list, uint8_t code) 
 #if defined CONFIG_UDHCP_DEBUG && CONFIG_UDHCP_DEBUG >= 1
 # define IF_UDHCP_VERBOSE(...) __VA_ARGS__
 extern unsigned dhcp_verbose;
-# define log1(...) do { if (dhcp_verbose >= 1) bb_info_msg(__VA_ARGS__); } while (0)
+# define log1(...) do { if (dhcp_verbose >= 1) bb_error_msg(__VA_ARGS__); } while (0)
 # if CONFIG_UDHCP_DEBUG >= 2
 void udhcp_dump_packet(struct dhcp_packet *packet) FAST_FUNC;
-#  define log2(...) do { if (dhcp_verbose >= 2) bb_info_msg(__VA_ARGS__); } while (0)
+#  define log2(...) do { if (dhcp_verbose >= 2) bb_error_msg(__VA_ARGS__); } while (0)
 # else
 #  define udhcp_dump_packet(...) ((void)0)
 #  define log2(...) ((void)0)
 # endif
 # if CONFIG_UDHCP_DEBUG >= 3
-#  define log3(...) do { if (dhcp_verbose >= 3) bb_info_msg(__VA_ARGS__); } while (0)
+#  define log3(...) do { if (dhcp_verbose >= 3) bb_error_msg(__VA_ARGS__); } while (0)
 # else
 #  define log3(...) ((void)0)
 # endif
@@ -310,7 +312,8 @@ int arpping(uint32_t test_nip,
 		const uint8_t *safe_mac,
 		uint32_t from_ip,
 		uint8_t *from_mac,
-		const char *interface) FAST_FUNC;
+		const char *interface,
+		unsigned timeo) FAST_FUNC;
 
 /* note: ip is a pointer to an IPv6 in network order, possibly misaliged */
 int sprint_nip6(char *dest, /*const char *pre,*/ const uint8_t *ip) FAST_FUNC;
