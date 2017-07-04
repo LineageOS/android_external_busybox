@@ -5,6 +5,17 @@
  *
  * Licensed under GPLv2, see file LICENSE in this source tree.
  */
+//config:config MATCHPATHCON
+//config:	bool "matchpathcon"
+//config:	default n
+//config:	depends on SELINUX
+//config:	help
+//config:	  Enable support to get default security context of the
+//config:	  specified path from the file contexts configuration.
+
+//applet:IF_MATCHPATHCON(APPLET(matchpathcon, BB_DIR_USR_SBIN, BB_SUID_DROP))
+
+//kbuild:lib-$(CONFIG_MATCHPATHCON) += matchpathcon.o
 
 //usage:#define matchpathcon_trivial_usage
 //usage:       "[-n] [-N] [-f file_contexts_file] [-p prefix] [-V]"
@@ -64,11 +75,13 @@ int matchpathcon_main(int argc UNUSED_PARAM, char **argv)
 			bb_perror_msg_and_die("error while processing %s", prefix);
 	}
 
+
 #ifdef ANDROID
 	if (!(opts & (OPT_FCONTEXT | OPT_PREFIX))) {
 		matchpathcon_init(selinux_file_contexts_path());
 	}
 #endif
+
 	while ((path = *argv++) != NULL) {
 		security_context_t con;
 		int rc;

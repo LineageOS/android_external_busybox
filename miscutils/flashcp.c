@@ -6,6 +6,16 @@
  *
  * Licensed under GPLv2, see file LICENSE in this source tree.
  */
+//config:config FLASHCP
+//config:	bool "flashcp"
+//config:	default n  # doesn't build on Ubuntu 8.04
+//config:	help
+//config:	  The flashcp binary, inspired by mtd-utils as of git head 5eceb74f7.
+//config:	  This utility is used to copy images into a MTD device.
+
+//applet:IF_FLASHCP(APPLET(flashcp, BB_DIR_USR_SBIN, BB_SUID_DROP))
+
+//kbuild:lib-$(CONFIG_FLASHCP) += flashcp.o
 
 //usage:#define flashcp_trivial_usage
 //usage:       "-v FILE MTD_DEVICE"
@@ -21,7 +31,7 @@
 
 #define OPT_v (1 << 0)
 
-#define BUFSIZE (8 * 1024)
+#define BUFSIZE (4 * 1024)
 
 static void progress(int mode, uoff_t count, uoff_t total)
 {

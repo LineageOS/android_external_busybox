@@ -153,6 +153,59 @@
  *                      setgid(specified group)
  *                      setuid()
  */
+//config:config INETD
+//config:	bool "inetd"
+//config:	default y
+//config:	select FEATURE_SYSLOG
+//config:	help
+//config:	  Internet superserver daemon
+//config:
+//config:config FEATURE_INETD_SUPPORT_BUILTIN_ECHO
+//config:	bool "Support echo service"
+//config:	default y
+//config:	depends on INETD
+//config:	help
+//config:	  Echo received data internal inetd service
+//config:
+//config:config FEATURE_INETD_SUPPORT_BUILTIN_DISCARD
+//config:	bool "Support discard service"
+//config:	default y
+//config:	depends on INETD
+//config:	help
+//config:	  Internet /dev/null internal inetd service
+//config:
+//config:config FEATURE_INETD_SUPPORT_BUILTIN_TIME
+//config:	bool "Support time service"
+//config:	default y
+//config:	depends on INETD
+//config:	help
+//config:	  Return 32 bit time since 1900 internal inetd service
+//config:
+//config:config FEATURE_INETD_SUPPORT_BUILTIN_DAYTIME
+//config:	bool "Support daytime service"
+//config:	default y
+//config:	depends on INETD
+//config:	help
+//config:	  Return human-readable time internal inetd service
+//config:
+//config:config FEATURE_INETD_SUPPORT_BUILTIN_CHARGEN
+//config:	bool "Support chargen service"
+//config:	default y
+//config:	depends on INETD
+//config:	help
+//config:	  Familiar character generator internal inetd service
+//config:
+//config:config FEATURE_INETD_RPC
+//config:	bool "Support RPC services"
+//config:	default n  # very rarely used, and needs Sun RPC support in libc
+//config:	depends on INETD
+//config:	select FEATURE_HAVE_RPC
+//config:	help
+//config:	  Support Sun-RPC based services
+
+//applet:IF_INETD(APPLET(inetd, BB_DIR_USR_SBIN, BB_SUID_DROP))
+
+//kbuild:lib-$(CONFIG_INETD) += inetd.o
 
 //usage:#define inetd_trivial_usage
 //usage:       "[-fe] [-q N] [-R N] [CONFFILE]"
@@ -170,6 +223,7 @@
 #include <sys/un.h>
 
 #include "libbb.h"
+#include "common_bufsiz.h"
 
 #if ENABLE_FEATURE_INETD_RPC
 # if defined(__UCLIBC__) && ! defined(__UCLIBC_HAS_RPC__)
@@ -327,11 +381,8 @@ struct globals {
 	/* Used in next_line(), and as scratch read buffer */
 	char line[256];          /* _at least_ 256, see LINE_SIZE */
 } FIX_ALIASING;
-#define G (*(struct globals*)&bb_common_bufsiz1)
+#define G (*(struct globals*)bb_common_bufsiz1)
 enum { LINE_SIZE = COMMON_BUFSIZE - offsetof(struct globals, line) };
-struct BUG_G_too_big {
-	char BUG_G_too_big[sizeof(G) <= COMMON_BUFSIZE ? 1 : -1];
-};
 #define rlim_ofile_cur  (G.rlim_ofile_cur )
 #define rlim_ofile      (G.rlim_ofile     )
 #define serv_list       (G.serv_list      )
@@ -352,6 +403,8 @@ struct BUG_G_too_big {
 #define allsock         (G.allsock        )
 #define line            (G.line           )
 #define INIT_G() do { \
+	setup_common_bufsiz(); \
+	BUILD_BUG_ON(sizeof(G) > COMMON_BUFSIZE); \
 	rlim_ofile_cur = OPEN_MAX; \
 	global_queuelen = 128; \
 	config_filename = "/etc/inetd.conf"; \
@@ -645,7 +698,7 @@ static servtab_t *dup_servtab(servtab_t *sep)
 }
 
 /* gcc generates much more code if this is inlined */
-static servtab_t *parse_one_line(void)
+static NOINLINE servtab_t *parse_one_line(void)
 {
 	int argc;
 	char *token[6+MAXARGV];
@@ -675,6 +728,8 @@ static servtab_t *parse_one_line(void)
 			 * default host for the following lines. */
 			free(default_local_hostname);
 			default_local_hostname = sep->se_local_hostname;
+			/*sep->se_local_hostname = NULL; - redundant */
+			/* (we'll overwrite this field anyway) */
 			goto more;
 		}
 	} else
@@ -688,10 +743,10 @@ static servtab_t *parse_one_line(void)
  parse_err:
 		bb_error_msg("parse error on line %u, line is ignored",
 				parser->lineno);
-		free_servtab_strings(sep);
 		/* Just "goto more" can make sep to carry over e.g.
 		 * "rpc"-ness (by having se_rpcver_lo != 0).
 		 * We will be more paranoid: */
+		free_servtab_strings(sep);
 		free(sep);
 		goto new;
 	}
@@ -725,7 +780,7 @@ static servtab_t *parse_one_line(void)
 			goto parse_err;
 #endif
 		}
-		if (strncmp(arg, "rpc/", 4) == 0) {
+		if (is_prefixed_with(arg, "rpc/")) {
 #if ENABLE_FEATURE_INETD_RPC
 			unsigned n;
 			arg += 4;
@@ -815,7 +870,7 @@ static servtab_t *parse_one_line(void)
 	}
 #endif
 	argc = 0;
-	while ((arg = token[6+argc]) != NULL && argc < MAXARGV)
+	while (argc < MAXARGV && (arg = token[6+argc]) != NULL)
 		sep->se_argv[argc++] = xstrdup(arg);
 	/* Some inetd.conf files have no argv's, not even argv[0].
 	 * Fix them up.
@@ -834,10 +889,10 @@ static servtab_t *parse_one_line(void)
 			goto parse_err;
 	}
 
-//	bb_info_msg(
-//		"ENTRY[%s][%s][%s][%d][%d][%d][%d][%d][%s][%s][%s]",
-//		sep->se_local_hostname, sep->se_service, sep->se_proto, sep->se_wait, sep->se_proto_no,
-//		sep->se_max, sep->se_count, sep->se_time, sep->se_user, sep->se_group, sep->se_program);
+	//bb_error_msg(
+	//	"ENTRY[%s][%s][%s][%d][%d][%d][%d][%d][%s][%s][%s]",
+	//	sep->se_local_hostname, sep->se_service, sep->se_proto, sep->se_wait, sep->se_proto_no,
+	//	sep->se_max, sep->se_count, sep->se_time, sep->se_user, sep->se_group, sep->se_program);
 
 	/* check if the hostname specifier is a comma separated list
 	 * of hostnames. we'll make new entries for each address. */
@@ -1151,8 +1206,8 @@ int inetd_main(int argc UNUSED_PARAM, char **argv)
 	if (real_uid != 0) /* run by non-root user */
 		config_filename = NULL;
 
-	opt_complementary = "R+:q+"; /* -q N, -R N */
-	opt = getopt32(argv, "R:feq:", &max_concurrency, &global_queuelen);
+	/* -q N, -R N */
+	opt = getopt32(argv, "R:+feq:+", &max_concurrency, &global_queuelen);
 	argv += optind;
 	//argc -= optind;
 	if (argv[0])
@@ -1385,6 +1440,7 @@ int inetd_main(int argc UNUSED_PARAM, char **argv)
 				int r;
 
 				close(new_udp_fd);
+				dbg("closed new_udp_fd:%d\n", new_udp_fd);
 				lsa = xzalloc_lsa(sep->se_family);
 				/* peek at the packet and remember peer addr */
 				r = recvfrom(ctrl, NULL, 0, MSG_PEEK|MSG_DONTWAIT,
@@ -1621,7 +1677,7 @@ static uint32_t machtime(void)
 	struct timeval tv;
 
 	gettimeofday(&tv, NULL);
-	return htonl((uint32_t)(tv.tv_sec + 2208988800UL));
+	return htonl((uint32_t)(tv.tv_sec + 2208988800UL)); 
 }
 /* ARGSUSED */
 static void FAST_FUNC machtime_stream(int s, servtab_t *sep UNUSED_PARAM)
@@ -1653,7 +1709,7 @@ static void FAST_FUNC daytime_stream(int s, servtab_t *sep UNUSED_PARAM)
 {
 	time_t t;
 
-	t = time(NULL);
+	time(&t);
 	fdprintf(s, "%.24s\r\n", ctime(&t));
 }
 static void FAST_FUNC daytime_dg(int s, servtab_t *sep)

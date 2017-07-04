@@ -107,6 +107,9 @@ static const probe_fptr fs1[] = {
 #if ENABLE_FEATURE_VOLUMEID_XFS
 	volume_id_probe_xfs,
 #endif
+#if ENABLE_FEATURE_VOLUMEID_BCACHE
+	volume_id_probe_bcache,
+#endif
 };
 
 /* fill buffer with maximum */
@@ -165,16 +168,18 @@ static const probe_fptr fs2[] = {
 #if ENABLE_FEATURE_VOLUMEID_OCFS2
 	volume_id_probe_ocfs2,
 #endif
+#if ENABLE_FEATURE_VOLUMEID_UBIFS
+	volume_id_probe_ubifs,
+#endif
 };
 
 int FAST_FUNC volume_id_probe_all(struct volume_id *id, /*uint64_t off,*/ uint64_t size)
 {
-	unsigned i, arsize;
+	unsigned i;
 
 	/* probe for raid first, cause fs probes may be successful on raid members */
 	if (size) {
-		arsize=ARRAY_SIZE(raid1);
-		for (i = 0; i < arsize; i++) {
+		for (i = 0; i < ARRAY_SIZE(raid1); i++) {
 			if (raid1[i](id, /*off,*/ size) == 0)
 				goto ret;
 			if (id->error)
@@ -182,8 +187,7 @@ int FAST_FUNC volume_id_probe_all(struct volume_id *id, /*uint64_t off,*/ uint64
 		}
 	}
 
-	arsize=ARRAY_SIZE(raid2);
-	for (i = 0; i < arsize; i++) {
+	for (i = 0; i < ARRAY_SIZE(raid2); i++) {
 		if (raid2[i](id /*,off*/) == 0)
 			goto ret;
 		if (id->error)
@@ -191,29 +195,25 @@ int FAST_FUNC volume_id_probe_all(struct volume_id *id, /*uint64_t off,*/ uint64
 	}
 
 	/* signature in the first block, only small buffer needed */
-	arsize=ARRAY_SIZE(fs1);
-	for (i = 0; i < arsize; i++) {
+	for (i = 0; i < ARRAY_SIZE(fs1); i++) {
 		if (fs1[i](id /*,off*/) == 0)
 			goto ret;
 		if (id->error)
 			goto ret;
 	}
 
-
 	/* fill buffer with maximum */
 	volume_id_get_buffer(id, 0, SB_BUFFER_SIZE);
 
-	arsize=ARRAY_SIZE(fs2);
-	for (i = 0; i < arsize; i++) {
+	for (i = 0; i < ARRAY_SIZE(fs2); i++) {
 		if (fs2[i](id /*,off*/) == 0)
-			break;
+			goto ret;
 		if (id->error)
-			break;
+			goto ret;
 	}
 
+ ret:
 	volume_id_free_buffer(id);
-
-ret:
 	return (- id->error); /* 0 or -1 */
 }
 
