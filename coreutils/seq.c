@@ -6,6 +6,15 @@
  *
  * Licensed under GPLv2, see file LICENSE in this source tree.
  */
+//config:config SEQ
+//config:	bool "seq"
+//config:	default y
+//config:	help
+//config:	  print a sequence of numbers
+
+//applet:IF_SEQ(APPLET_NOFORK(seq, seq, BB_DIR_USR_BIN, BB_SUID_DROP, seq))
+
+//kbuild:lib-$(CONFIG_SEQ) += seq.o
 
 //usage:#define seq_trivial_usage
 //usage:       "[-w] [-s SEP] [FIRST [INC]] LAST"
@@ -28,7 +37,7 @@ int seq_main(int argc, char **argv)
 	};
 	double first, last, increment, v;
 	unsigned n;
-	int width;
+	unsigned width;
 	unsigned frac_part;
 	const char *sep, *opt_s = "\n";
 	unsigned opt;

@@ -4,7 +4,6 @@
  *
  * Licensed under GPLv2 or later, see file LICENSE in this source tree.
  */
-
 /* [date unknown. Perhaps before year 2000]
  * To achieve a small memory footprint, this version of 'ls' doesn't do any
  * file sorting, and only has the most essential command line switches
@@ -28,6 +27,75 @@
  * [2009-03]
  * ls sorts listing now, and supports almost all options.
  */
+//config:config LS
+//config:	bool "ls"
+//config:	default y
+//config:	help
+//config:	  ls is used to list the contents of directories.
+//config:
+//config:config FEATURE_LS_FILETYPES
+//config:	bool "Enable filetyping options (-p and -F)"
+//config:	default y
+//config:	depends on LS
+//config:	help
+//config:	  Enable the ls options (-p and -F).
+//config:
+//config:config FEATURE_LS_FOLLOWLINKS
+//config:	bool "Enable symlinks dereferencing (-L)"
+//config:	default y
+//config:	depends on LS
+//config:	help
+//config:	  Enable the ls option (-L).
+//config:
+//config:config FEATURE_LS_RECURSIVE
+//config:	bool "Enable recursion (-R)"
+//config:	default y
+//config:	depends on LS
+//config:	help
+//config:	  Enable the ls option (-R).
+//config:
+//config:config FEATURE_LS_SORTFILES
+//config:	bool "Sort the file names"
+//config:	default y
+//config:	depends on LS
+//config:	help
+//config:	  Allow ls to sort file names alphabetically.
+//config:
+//config:config FEATURE_LS_TIMESTAMPS
+//config:	bool "Show file timestamps"
+//config:	default y
+//config:	depends on LS
+//config:	help
+//config:	  Allow ls to display timestamps for files.
+//config:
+//config:config FEATURE_LS_USERNAME
+//config:	bool "Show username/groupnames"
+//config:	default y
+//config:	depends on LS
+//config:	help
+//config:	  Allow ls to display username/groupname for files.
+//config:
+//config:config FEATURE_LS_COLOR
+//config:	bool "Allow use of color to identify file types"
+//config:	default y
+//config:	depends on LS && LONG_OPTS
+//config:	help
+//config:	  This enables the --color option to ls.
+//config:
+//config:config FEATURE_LS_COLOR_IS_DEFAULT
+//config:	bool "Produce colored ls output by default"
+//config:	default y
+//config:	depends on FEATURE_LS_COLOR
+//config:	help
+//config:	  Saying yes here will turn coloring on by default,
+//config:	  even if no "--color" option is given to the ls command.
+//config:	  This is not recommended, since the colors are not
+//config:	  configurable, and the output may not be legible on
+//config:	  many output screens.
+
+//applet:IF_LS(APPLET_NOEXEC(ls, ls, BB_DIR_BIN, BB_SUID_DROP, ls))
+
+//kbuild:lib-$(CONFIG_LS) += ls.o
 
 //usage:#define ls_trivial_usage
 //usage:	"[-1AaCxd"
@@ -93,6 +161,7 @@
 //usage:	)
 
 #include "libbb.h"
+#include "common_bufsiz.h"
 #include "unicode.h"
 
 
@@ -365,8 +434,9 @@ struct globals {
 	time_t current_time_t;
 #endif
 } FIX_ALIASING;
-#define G (*(struct globals*)&bb_common_bufsiz1)
+#define G (*(struct globals*)bb_common_bufsiz1)
 #define INIT_G() do { \
+	setup_common_bufsiz(); \
 	/* we have to zero it out because of NOEXEC */ \
 	memset(&G, 0, sizeof(G)); \
 	IF_FEATURE_AUTOWIDTH(G_terminal_width = TERMINAL_WIDTH;) \
@@ -537,28 +607,28 @@ static NOINLINE unsigned display_single(const struct dnode *dn)
 	}
 #if ENABLE_FEATURE_LS_USERNAME
 	else if (G.all_fmt & LIST_ID_NAME) {
-		//extend user/group names to 12 char. 
+
+    
+		//extend user/group names to 12 char.
 		//if terminal has more than 88 cols (or -w 88 is set)
+		#define UGDEF_FMT "%-8.8s "
+		char* ug_fmt = UGDEF_FMT;
+    char* ug_fmt2 = UGDEF_FMT UGDEF_FMT;
+
 		if (G_terminal_width >= 88) {
 			#define UGLONG_FMT "%-12.12s "
-			if (option_mask32 & OPT_g) {
-				column += printf(UGLONG_FMT,
-					get_cached_groupname(dn->dn_gid));
-			} else {
-				column += printf(UGLONG_FMT UGLONG_FMT,
-					get_cached_username(dn->dn_uid),
-					get_cached_groupname(dn->dn_gid));
-			}
+      ug_fmt = UGLONG_FMT;
+      ug_fmt2 = UGLONG_FMT UGLONG_FMT;
+    }
+    
+
+		if (option_mask32 & OPT_g) {
+			column += printf(ug_fmt,
+				get_cached_groupname(dn->dn_gid));
 		} else {
-			#define UGDEF_FMT "%-8.8s "
-			if (option_mask32 & OPT_g) {
-				column += printf(UGDEF_FMT,
-					get_cached_groupname(dn->dn_gid));
-			} else {
-				column += printf(UGDEF_FMT UGDEF_FMT,
-					get_cached_username(dn->dn_uid),
-					get_cached_groupname(dn->dn_gid));
-			}
+			column += printf(ug_fmt2,
+				get_cached_username(dn->dn_uid),
+				get_cached_groupname(dn->dn_gid));
 		}
 	}
 #endif
@@ -581,12 +651,12 @@ static NOINLINE unsigned display_single(const struct dnode *dn)
 #if ENABLE_FEATURE_LS_TIMESTAMPS
 	if (G.all_fmt & (LIST_FULLTIME|LIST_DATE_TIME)) {
 		char *filetime;
-		time_t ttime = dn->dn_mtime;
+		const time_t *ttime = &dn->dn_mtime;
 		if (G.all_fmt & TIME_ACCESS)
-			ttime = dn->dn_atime;
+			ttime = &dn->dn_atime;
 		if (G.all_fmt & TIME_CHANGE)
-			ttime = dn->dn_ctime;
-		filetime = ctime(&ttime);
+			ttime = &dn->dn_ctime;
+		filetime = ctime(ttime);
 		/* filetime's format: "Wed Jun 30 21:49:08 1993\n" */
 		if (G.all_fmt & LIST_FULLTIME) { /* -e */
 			/* Note: coreutils 8.4 ls --full-time prints:
@@ -595,13 +665,16 @@ static NOINLINE unsigned display_single(const struct dnode *dn)
 			column += printf("%.24s ", filetime);
 		} else { /* LIST_DATE_TIME */
 			/* G.current_time_t ~== time(NULL) */
-			time_t age = G.current_time_t - ttime;
-			printf("%.6s ", filetime + 4); /* "Jun 30" */
+			time_t age = G.current_time_t - *ttime;
 			if (age < 3600L * 24 * 365 / 2 && age > -15 * 60) {
-				/* hh:mm if less than 6 months old */
-				printf("%.5s ", filetime + 11);
-			} else { /* year. buggy if year > 9999 ;) */
-				printf(" %.4s ", filetime + 20);
+				/* less than 6 months old */
+				/* "mmm dd hh:mm " */
+				printf("%.12s ", filetime + 4);
+			} else {
+				/* "mmm dd  yyyy " */
+				/* "mmm dd yyyyy " after year 9999 :) */
+				strchr(filetime + 20, '\n')[0] = ' ';
+				printf("%.7s%6s", filetime + 4, filetime + 20);
 			}
 			column += 13;
 		}
@@ -680,7 +753,7 @@ static void display_files(struct dnode **dn, unsigned nfiles)
 			if ((int)column_width < len)
 				column_width = len;
 		}
-		column_width += 1 +
+		column_width += 2 +
 			IF_SELINUX( ((G.all_fmt & LIST_CONTEXT) ? 33 : 0) + )
 				((G.all_fmt & LIST_INO) ? 8 : 0) +
 				((G.all_fmt & LIST_BLOCKS) ? 5 : 0);
@@ -708,8 +781,8 @@ static void display_files(struct dnode **dn, unsigned nfiles)
 			if (i < nfiles) {
 				if (column > 0) {
 					nexttab -= column;
-					printf("%*s ", nexttab, "");
-					column += nexttab + 1;
+					printf("%*s", nexttab, "");
+					column += nexttab;
 				}
 				nexttab = column + column_width;
 				column += display_single(dn[i]);
@@ -1047,7 +1120,7 @@ static void scan_and_display_dirs_recur(struct dnode **dn, int first)
 		}
 		subdnp = scan_one_dir((*dn)->fullname, &nfiles);
 #if ENABLE_DESKTOP
-		if ((G.all_fmt & STYLE_MASK) == STYLE_LONG)
+		if ((G.all_fmt & STYLE_MASK) == STYLE_LONG || (G.all_fmt & LIST_BLOCKS))
 			printf("total %"OFF_FMT"u\n", calculate_blocks(subdnp));
 #endif
 		if (nfiles > 0) {
@@ -1117,7 +1190,7 @@ int ls_main(int argc UNUSED_PARAM, char **argv)
 
 #if ENABLE_FEATURE_AUTOWIDTH
 	/* obtain the terminal width */
-	get_terminal_width_height(STDIN_FILENO, &G_terminal_width, NULL);
+	G_terminal_width = get_terminal_width(STDIN_FILENO);
 	/* go one less... */
 	G_terminal_width--;
 #endif

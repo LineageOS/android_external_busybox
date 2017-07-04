@@ -47,6 +47,7 @@
  * NOTE: System headers on GNU/Linux may #define this macro already,
  * so if you want to change it, you need to #undef it first.
  */
+
 #ifdef __BIONIC__
 #undef __always_inline
 #endif

@@ -16,15 +16,13 @@
  *
  *----------------------------------------------------------------------
  */
-/* BB_AUDIT SUSv3 _NOT_ compliant -- missing options -b, -d, -l, -m, -p, -q, -r, -s, -t, -T, -u; Missing argument 'file'.  */
-
 //config:config WHO
 //config:      bool "who"
 //config:      default y
 //config:      depends on FEATURE_UTMP
 //config:      help
 //config:        who is used to show who is logged on.
-
+//config:
 //config:config USERS
 //config:      bool "users"
 //config:      default y
@@ -33,10 +31,12 @@
 //config:        Print users currently logged on.
 
 //applet:IF_USERS(APPLET_ODDNAME(users, who, BB_DIR_USR_BIN, BB_SUID_DROP, users))
-//applet:IF_WHO(  APPLET(  who, BB_DIR_USR_BIN, BB_SUID_DROP))
+//applet:IF_WHO(APPLET(who, BB_DIR_USR_BIN, BB_SUID_DROP))
 
 //kbuild:lib-$(CONFIG_USERS) += who.o
 //kbuild:lib-$(CONFIG_WHO) += who.o
+
+/* BB_AUDIT SUSv3 _NOT_ compliant -- missing options -b, -d, -l, -m, -p, -q, -r, -s, -t, -T, -u; Missing argument 'file'.  */
 
 //usage:#define users_trivial_usage
 //usage:       ""
@@ -73,7 +73,7 @@ static void idle_string(char *str6, time_t t)
 int who_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int who_main(int argc UNUSED_PARAM, char **argv)
 {
-	struct utmp *ut;
+	struct utmpx *ut;
 	unsigned opt;
 	int do_users = (ENABLE_USERS && (!ENABLE_WHO || applet_name[0] == 'u'));
 	const char *fmt = "%s";
@@ -81,10 +81,10 @@ int who_main(int argc UNUSED_PARAM, char **argv)
 	opt_complementary = "=0";
 	opt = getopt32(argv, do_users ? "" : "aH");
 	if (opt & 2) // -H
-		printf("USER\t\tTTY\t\tIDLE\tTIME\t\t HOST\n");
+		puts("USER\t\tTTY\t\tIDLE\tTIME\t\t HOST");
 
-	setutent();
-	while ((ut = getutent()) != NULL) {
+	setutxent();
+	while ((ut = getutxent()) != NULL) {
 		if (ut->ut_user[0]
 		 && ((opt & 1) || ut->ut_type == USER_PROCESS)
 		) {
@@ -126,6 +126,6 @@ int who_main(int argc UNUSED_PARAM, char **argv)
 	if (do_users)
 		bb_putchar('\n');
 	if (ENABLE_FEATURE_CLEAN_UP)
-		endutent();
+		endutxent();
 	return EXIT_SUCCESS;
 }

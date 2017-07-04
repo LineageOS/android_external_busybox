@@ -28,10 +28,27 @@
  *
  * Licensed under GPLv2, see file LICENSE in this source tree.
  */
+//config:config RUNCON
+//config:	bool "runcon"
+//config:	default n
+//config:	depends on SELINUX
+//config:	help
+//config:	  Enable support to run command in specified security context.
+//config:
+//config:config FEATURE_RUNCON_LONG_OPTIONS
+//config:	bool "Enable long options"
+//config:	default y
+//config:	depends on RUNCON && LONG_OPTS
+//config:	help
+//config:	  Support long options for the runcon applet.
+
+//applet:IF_RUNCON(APPLET(runcon, BB_DIR_USR_BIN, BB_SUID_DROP))
+
+//kbuild:lib-$(CONFIG_RUNCON) += runcon.o
 
 //usage:#define runcon_trivial_usage
-//usage:       "[-c] [-u USER] [-r ROLE] [-t TYPE] [-l RANGE] PROG -- ARGS\n"
-//usage:       "runcon CONTEXT PROG -- ARGS"
+//usage:       "[-c] [-u USER] [-r ROLE] [-t TYPE] [-l RANGE] PROG ARGS\n"
+//usage:       "runcon CONTEXT PROG ARGS"
 //usage:#define runcon_full_usage "\n\n"
 //usage:       "Run PROG in a different security context\n"
 //usage:     "\n	CONTEXT		Complete security context\n"
@@ -51,9 +68,13 @@
 //usage:	)
 
 #include <selinux/context.h>
+
 #ifndef ANDROID
-#include <selinux/flask.h>
+/* from deprecated <selinux/flask.h>: */
+#undef  SECCLASS_PROCESS
+#define SECCLASS_PROCESS 2
 #endif
+
 
 #include "libbb.h"
 

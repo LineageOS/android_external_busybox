@@ -6,12 +6,24 @@
  *
  * Licensed under GPLv2 or later, see file LICENSE in this source tree.
  */
+//config:config LOADKMAP
+//config:	bool "loadkmap"
+//config:	default y
+//config:	select PLATFORM_LINUX
+//config:	help
+//config:	  This program loads a keyboard translation table from
+//config:	  standard input.
+
+//applet:IF_LOADKMAP(APPLET(loadkmap, BB_DIR_SBIN, BB_SUID_DROP))
+
+//kbuild:lib-$(CONFIG_LOADKMAP) += loadkmap.o
 
 //usage:#define loadkmap_trivial_usage
 //usage:       "< keymap"
 //usage:#define loadkmap_full_usage "\n\n"
-//usage:       "Load a binary keyboard translation table from stdin\n"
-/* //usage:     "\n	-C TTY	Affect TTY instead of /dev/tty" */
+//usage:       "Load a binary keyboard translation table from stdin"
+////usage:       "\n"
+////usage:       "\n	-C TTY	Affect TTY instead of /dev/tty"
 //usage:
 //usage:#define loadkmap_example_usage
 //usage:       "$ loadkmap < /etc/i18n/lang-keymap\n"
@@ -56,7 +68,7 @@ int loadkmap_main(int argc UNUSED_PARAM, char **argv)
 */
 
 	xread(STDIN_FILENO, flags, 7);
-	if (strncmp(flags, BINARY_KEYMAP_MAGIC, 7))
+	if (!is_prefixed_with(flags, BINARY_KEYMAP_MAGIC))
 		bb_error_msg_and_die("not a valid binary keymap");
 
 	xread(STDIN_FILENO, flags, MAX_NR_KEYMAPS);
