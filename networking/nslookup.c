@@ -10,6 +10,15 @@
  *
  * Licensed under GPLv2 or later, see file LICENSE in this source tree.
  */
+//config:config NSLOOKUP
+//config:	bool "nslookup"
+//config:	default y
+//config:	help
+//config:	  nslookup is a tool to query Internet name servers.
+
+//applet:IF_NSLOOKUP(APPLET(nslookup, BB_DIR_USR_BIN, BB_SUID_DROP))
+
+//kbuild:lib-$(CONFIG_NSLOOKUP) += nslookup.o
 
 //usage:#define nslookup_trivial_usage
 //usage:       "[HOST] [SERVER]"
@@ -49,10 +58,9 @@ struct __res_state * __res_state(void)
 {
 	return &res_st;
 }
-#endif
 
 #define EXT(res) ((&res)->_u._ext)
-
+#endif
 /*
  * I'm only implementing non-interactive mode;
  * I totally forgot nslookup even had an interactive mode.
@@ -154,7 +162,7 @@ static void server_print(void)
 
 	if (!sa)
 #endif
-		sa = (struct sockaddr*) &_res.nsaddr_list[0];
+		sa = (struct sockaddr*)&_res.nsaddr_list[0];
 	server = xmalloc_sockaddr2dotted_noport(sa);
 
 	print_host(server, "Server:");
@@ -172,7 +180,7 @@ static void set_default_dns(const char *server)
 	if (!server)
 		return;
 
-	/* NB: this works even with, say, "[::1]:53"! :) */
+	/* NB: this works even with, say, "[::1]:5353"! :) */
 	lsa = xhost2sockaddr(server, 53);
 
 	if (lsa->u.sa.sa_family == AF_INET) {
@@ -180,7 +188,6 @@ static void set_default_dns(const char *server)
 		/* struct copy */
 		_res.nsaddr_list[0] = lsa->u.sin;
 	}
-
 #if ENABLE_FEATURE_IPV6
 	/* Hoped libc can cope with IPv4 address there too.
 	 * No such luck, glibc 2.4 segfaults even with IPv6,
@@ -197,8 +204,8 @@ static void set_default_dns(const char *server)
 				sizeof(struct sockaddr_in6));
 		}
 	#else
-		/* store a pointer to part of malloc'ed lsa */
 		_res._u._ext.nscount = 1;
+		/* store a pointer to part of malloc'ed lsa */
 		_res._u._ext.nsaddrs[0] = &lsa->u.sin6;
 		/* must not free(lsa)! */
 	#endif
